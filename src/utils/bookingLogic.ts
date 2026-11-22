@@ -324,13 +324,16 @@ export function generateWhatsAppMessageText(booking: ConfirmedDemoBooking): stri
 
 /**
  * Builds a direct click-to-chat WhatsApp link targeting the salon reception number.
- * Default target: 919196355139 (Lucknow sanctuary).
+ * Default target: 917275256535 (testing reception number; Lucknow sanctuary).
  */
 export function generateWhatsAppBookingUrl(
   booking: ConfirmedDemoBooking,
-  targetPhone = '919196355139'
+  targetPhone = '917275256535'
 ): string {
-  const cleanPhone = targetPhone.replace(/\D/g, '');
+  let cleanPhone = targetPhone.replace(/\D/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = `91${cleanPhone}`;
+  }
   const text = generateWhatsAppMessageText(booking);
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
 }

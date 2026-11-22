@@ -179,7 +179,7 @@ test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon
   });
 
   const waUrl = generateWhatsAppBookingUrl(booking);
-  assert.ok(waUrl.startsWith('https://wa.me/919196355139?text='));
+  assert.ok(waUrl.startsWith('https://wa.me/917275256535?text='));
   assert.ok(waUrl.includes('Priya%20Sharma'));
   assert.ok(waUrl.includes('NOVA%20Signature%20Facial'));
 

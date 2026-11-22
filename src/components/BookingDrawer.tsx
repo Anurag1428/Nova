@@ -490,11 +490,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     {/* Direct Desk Call & Copy Details Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#18224B]/10 text-xs font-basel">
                       <a
-                        href="tel:+919196355139"
+                        href="tel:+917275256535"
                         className="inline-flex items-center gap-1.5 text-[#18224B] hover:underline cursor-pointer"
                       >
                         <span>Call Reception:</span>
-                        <span className="font-mono-tabular font-medium">(+91) 9196355139</span>
+                        <span className="font-mono-tabular font-medium">(+91) 7275256535</span>
                       </a>
 
                       <button
