@@ -599,12 +599,20 @@ export async function sendLeadToAirtable(
 
       const isValidEmail = (str?: string) => Boolean(str && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str.trim()));
       const isValidDate = (str?: string) => Boolean(str && /^\d{4}-\d{2}-\d{2}$/.test(str.trim()));
+      const formatIndianPhone = (phoneStr: string) => {
+        const clean = (phoneStr || '').replace(/\D/g, '');
+        if (clean.length === 10) return `+91 ${clean.slice(0, 5)} ${clean.slice(5)}`;
+        if (clean.startsWith('91') && clean.length === 12) {
+          return `+91 ${clean.slice(2, 7)} ${clean.slice(7)}`;
+        }
+        return phoneStr;
+      };
 
       const fields: Record<string, any> = isVip
         ? {
             'Voucher Code': lead.referenceCode || 'NOVA-VIP500',
             'Client Name': lead.clientName,
-            Phone: lead.clientPhone,
+            Phone: formatIndianPhone(lead.clientPhone),
             ...(isValidEmail(lead.clientEmail) ? { Email: lead.clientEmail.trim() } : {}),
             Ritual: lead.ritualName || 'Signature Facial',
             'Voucher Value': 500,
@@ -614,7 +622,7 @@ export async function sendLeadToAirtable(
           }
         : {
             'Client Name': lead.clientName,
-            Phone: lead.clientPhone,
+            Phone: formatIndianPhone(lead.clientPhone),
             ...(isValidEmail(lead.clientEmail) ? { Email: lead.clientEmail.trim() } : {}),
             Ritual: lead.ritualName || 'Signature Facial',
             'Preferred Date': isValidDate(lead.preferredDate)

@@ -174,11 +174,15 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
         const rituals = getCategoryServices(activeCat.id);
         const curRitual = rituals.find((r) => r.id === form.ritualId) || rituals[0];
 
+        const formattedPhone = cleanPhone.length === 10
+          ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+          : form.clientPhone.trim();
+
         const draftLead = saveCapturedLead({
           id: currentLeadIdRef.current || undefined,
           referenceCode: `LEAD-${cleanPhone.slice(-4)}`,
           clientName: form.clientName.trim() || 'Sanctuary Guest',
-          clientPhone: form.clientPhone.trim(),
+          clientPhone: formattedPhone,
           clientEmail: form.clientEmail.trim() || '',
           ritualName: curRitual?.name || 'Consultation Ritual',
           categoryId: activeCat.id,
