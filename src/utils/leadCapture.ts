@@ -1,4 +1,5 @@
 import { ConfirmedDemoBooking, generateWhatsAppMessageText } from './bookingLogic';
+import { SALON_CONFIG } from '../data/salonData';
 
 export type LeadStatus =
   | 'draft_entered'          // visitor filled name and phone in step 3
@@ -35,6 +36,7 @@ export interface ConciergeSettings {
   receptionPhone: string;
   notificationEmail: string;
   webhookUrl: string;
+  googleSheetsWebhookUrl?: string;
   securityPin: string;
   callMeBotApiKey?: string;
   telegramBotToken?: string;
@@ -46,6 +48,7 @@ export const DEFAULT_CONCIERGE_SETTINGS: ConciergeSettings = {
   receptionPhone: '917275256535',
   notificationEmail: 'info@novasalon.in',
   webhookUrl: '',
+  googleSheetsWebhookUrl: '',
   securityPin: '1428',
   callMeBotApiKey: '',
   telegramBotToken: '',
@@ -387,7 +390,48 @@ export async function dispatchLeadNotification(
     }
   }
 
-  // 3. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
+  // 3. Automated dispatch directly to Owner's Google Sheet (via Google Apps Script Webhook)
+  const googleSheetUrl =
+    settings.googleSheetsWebhookUrl ||
+    (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.googleSheetsWebhookUrl);
+
+  if (googleSheetUrl) {
+    try {
+      const sheetRow = {
+        timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        referenceCode: lead.referenceCode,
+        clientName: lead.clientName,
+        clientPhone: lead.clientPhone,
+        clientEmail: lead.clientEmail,
+        ritualName: lead.ritualName,
+        duration: lead.duration,
+        examplePrice: lead.examplePrice,
+        preferredDate: lead.preferredDate,
+        preferredTime: lead.preferredTime,
+        status:
+          lead.status === 'vip_privilege_claimed'
+            ? '₹500 VIP Voucher Claimed'
+            : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
+              ? 'Form Filled (Did Not Send)'
+              : lead.status === 'dispatched_whatsapp'
+                ? 'Sent via WhatsApp'
+                : lead.status,
+        notes: lead.notes || '',
+      };
+
+      await fetch(googleSheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sheetRow),
+        mode: 'no-cors',
+      });
+      channels.push('google_sheets');
+    } catch (e) {
+      console.warn('Google Sheets dispatch failed', e);
+    }
+  }
+
+  // 4. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
   if (settings.callMeBotApiKey) {
     try {
       const cleanAdminPhone = (settings.receptionPhone || '917275256535').replace(/\D/g, '');
@@ -476,3 +520,91 @@ export function exportLeadsToCsv(leads: CapturedLeadRecord[]): string {
 
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }
+
+/**
+ * Sends a captured lead row directly to the owner's Google Sheet Webhook.
+ */
+export async function sendLeadToGoogleSheet(
+  lead: CapturedLeadRecord,
+  customWebhookUrl?: string
+): Promise<boolean> {
+  const url =
+    customWebhookUrl ||
+    getConciergeSettings().googleSheetsWebhookUrl ||
+    (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.googleSheetsWebhookUrl);
+
+  if (!url) return false;
+
+  try {
+    const row = {
+      timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+      referenceCode: lead.referenceCode,
+      clientName: lead.clientName,
+      clientPhone: lead.clientPhone,
+      clientEmail: lead.clientEmail,
+      ritualName: lead.ritualName,
+      duration: lead.duration,
+      examplePrice: lead.examplePrice,
+      preferredDate: lead.preferredDate,
+      preferredTime: lead.preferredTime,
+      status: lead.status,
+      notes: lead.notes || '',
+    };
+
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(row),
+      mode: 'no-cors',
+    });
+    return true;
+  } catch (err) {
+    console.warn('sendLeadToGoogleSheet error', err);
+    return false;
+  }
+}
+
+/**
+ * The 10-line Google Apps Script template for the owner's Google Sheet:
+ * 
+ * function doPost(e) {
+ *   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+ *   var data = JSON.parse(e.postData.contents);
+ *   sheet.appendRow([
+ *     data.timestamp,
+ *     data.referenceCode,
+ *     data.clientName,
+ *     data.clientPhone,
+ *     data.clientEmail,
+ *     data.ritualName,
+ *     data.duration,
+ *     data.examplePrice,
+ *     data.preferredDate,
+ *     data.preferredTime,
+ *     data.status,
+ *     data.notes
+ *   ]);
+ *   return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+ *     .setMimeType(ContentService.MimeType.JSON);
+ * }
+ */
+export const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    data.timestamp,
+    data.referenceCode,
+    data.clientName,
+    data.clientPhone,
+    data.clientEmail,
+    data.ritualName,
+    data.duration,
+    data.examplePrice,
+    data.preferredDate,
+    data.preferredTime,
+    data.status,
+    data.notes
+  ]);
+  return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;

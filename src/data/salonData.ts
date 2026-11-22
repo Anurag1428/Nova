@@ -489,4 +489,10 @@ export const SALON_CONFIG = {
       { label: 'Gift Cards', url: '#gift-cards' },
     ],
   },
+
+  integrations: {
+    // Google Sheets Webhook: every booking & VIP lead is automatically appended to owner's Google Sheet
+    googleSheetsWebhookUrl:
+      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL) || '',
+  },
 };

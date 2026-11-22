@@ -12,6 +12,8 @@ import {
   getConciergeSettings,
   verifyConciergePin,
   updateConciergePin,
+  sendLeadToGoogleSheet,
+  GOOGLE_APPS_SCRIPT_TEMPLATE,
 } from './leadCapture';
 
 test('saveCapturedLead and getCapturedLeads persist and order leads newest first', () => {
@@ -187,4 +189,32 @@ test('verifyConciergePin validates 4-digit security PIN and rejects unauthorized
 
   // Restore default for other tests
   updateConciergePin('1428');
+});
+
+test('GOOGLE_APPS_SCRIPT_TEMPLATE provides valid Apps Script code', () => {
+  assert.ok(GOOGLE_APPS_SCRIPT_TEMPLATE.includes('function doPost(e)'));
+  assert.ok(GOOGLE_APPS_SCRIPT_TEMPLATE.includes('SpreadsheetApp.getActiveSpreadsheet()'));
+  assert.ok(GOOGLE_APPS_SCRIPT_TEMPLATE.includes('sheet.appendRow'));
+});
+
+test('sendLeadToGoogleSheet safely handles missing webhook URL', async () => {
+  const res = await sendLeadToGoogleSheet({
+    id: 'test-gs',
+    referenceCode: 'NOVA-GS01',
+    clientName: 'Test Guest',
+    clientPhone: '+91 7275256535',
+    clientEmail: 'test@example.com',
+    ritualName: 'The NOVA Signature Facial',
+    categoryId: 'facials',
+    duration: '75 min',
+    examplePrice: '₹4,100',
+    preferredDate: '2026-11-26',
+    preferredTime: '11:00 AM',
+    notes: '',
+    capturedAtIso: new Date().toISOString(),
+    updatedAtIso: new Date().toISOString(),
+    status: 'confirmed_on_site',
+    sentNotification: false,
+  }, '');
+  assert.equal(res, false);
 });
