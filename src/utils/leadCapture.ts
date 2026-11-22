@@ -597,12 +597,15 @@ export async function sendLeadToAirtable(
         ? airtableConfig.vipTableId || 'tblGXJsK7tQWqf0kP'
         : airtableConfig.bookingsTableId || 'tblzJVBkuxP6xSINF';
 
+      const isValidEmail = (str?: string) => Boolean(str && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str.trim()));
+      const isValidDate = (str?: string) => Boolean(str && /^\d{4}-\d{2}-\d{2}$/.test(str.trim()));
+
       const fields: Record<string, any> = isVip
         ? {
             'Voucher Code': lead.referenceCode || 'NOVA-VIP500',
             'Client Name': lead.clientName,
             Phone: lead.clientPhone,
-            Email: lead.clientEmail,
+            ...(isValidEmail(lead.clientEmail) ? { Email: lead.clientEmail.trim() } : {}),
             Ritual: lead.ritualName || 'Signature Facial',
             'Voucher Value': 500,
             Status: 'Active',
@@ -612,9 +615,11 @@ export async function sendLeadToAirtable(
         : {
             'Client Name': lead.clientName,
             Phone: lead.clientPhone,
-            Email: lead.clientEmail,
+            ...(isValidEmail(lead.clientEmail) ? { Email: lead.clientEmail.trim() } : {}),
             Ritual: lead.ritualName || 'Signature Facial',
-            'Preferred Date': lead.preferredDate || new Date().toISOString().split('T')[0],
+            'Preferred Date': isValidDate(lead.preferredDate)
+              ? lead.preferredDate
+              : new Date().toISOString().split('T')[0],
             'Preferred Time': lead.preferredTime || '10:30 AM',
             Status: lead.status === 'dispatched_whatsapp' ? 'Confirmed' : 'Requested',
             Notes: `Booking Ref: ${lead.referenceCode}${lead.duration ? ' · ' + lead.duration : ''}${lead.examplePrice ? ' · ' + lead.examplePrice : ''}${lead.notes ? ' · ' + lead.notes : ''}`,
