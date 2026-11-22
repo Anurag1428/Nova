@@ -494,7 +494,26 @@ export const SALON_CONFIG = {
     // Google Sheets Webhook: every booking & VIP lead is automatically appended to owner's Google Sheet
     googleSheetsWebhookUrl:
       (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL) || '',
-    // Airtable Webhook: every booking & VIP lead is automatically appended to owner's Airtable CRM
+    // Airtable CRM direct integration (Token + Base)
+    airtable: {
+      token:
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_TOKEN) ||
+        (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_TOKEN : '') ||
+        '',
+      baseId:
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_BASE_ID) ||
+        (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_BASE_ID : '') ||
+        'appy0KzWMlpXE4TNN',
+      bookingsTableId:
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_BOOKINGS_TABLE_ID) ||
+        (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_BOOKINGS_TABLE_ID : '') ||
+        'tblzJVBkuxP6xSINF',
+      vipTableId:
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_VIP_TABLE_ID) ||
+        (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_VIP_TABLE_ID : '') ||
+        'tblGXJsK7tQWqf0kP',
+    },
+    // Optional Airtable Webhook URL
     airtableWebhookUrl:
       (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_WEBHOOK_URL) || '',
   },

@@ -433,45 +433,14 @@ export async function dispatchLeadNotification(
     }
   }
 
-  // 4. Automated dispatch directly to Owner's Airtable CRM (via Airtable Webhook Automation)
-  const airtableUrl =
-    settings.airtableWebhookUrl ||
-    (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.airtableWebhookUrl);
-
-  if (airtableUrl) {
-    try {
-      const airtablePayload = {
-        timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        referenceCode: lead.referenceCode,
-        clientName: lead.clientName,
-        clientPhone: lead.clientPhone,
-        clientEmail: lead.clientEmail,
-        ritualName: lead.ritualName,
-        duration: lead.duration,
-        examplePrice: lead.examplePrice,
-        preferredDate: lead.preferredDate,
-        preferredTime: lead.preferredTime,
-        status:
-          lead.status === 'vip_privilege_claimed'
-            ? 'VIP ₹500 Claimed'
-            : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
-              ? 'Form Filled (Needs Follow-up)'
-              : lead.status === 'dispatched_whatsapp'
-                ? 'Dispatched WhatsApp'
-                : lead.status,
-        notes: lead.notes || '',
-      };
-
-      await fetch(airtableUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(airtablePayload),
-        mode: 'no-cors',
-      });
+  // 4. Automated dispatch directly to Owner's Airtable CRM (Base & Tables)
+  try {
+    const airtableSent = await sendLeadToAirtable(lead);
+    if (airtableSent) {
       channels.push('airtable');
-    } catch (e) {
-      console.warn('Airtable dispatch failed', e);
     }
+  } catch (e) {
+    console.warn('Airtable dispatch failed', e);
   }
 
   // 5. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
@@ -608,53 +577,108 @@ export async function sendLeadToGoogleSheet(
 }
 
 /**
- * Sends a captured lead row directly to the owner's Airtable Webhook Automation.
+ * Sends a captured lead directly to the owner's Airtable CRM (Base / Tables / Webhook).
  */
 export async function sendLeadToAirtable(
   lead: CapturedLeadRecord,
   customWebhookUrl?: string
 ): Promise<boolean> {
-  const url =
+  const airtableConfig = (SALON_CONFIG as any)?.integrations?.airtable;
+  const webhookUrl =
     customWebhookUrl ||
     getConciergeSettings().airtableWebhookUrl ||
     (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.airtableWebhookUrl);
 
-  if (!url) return false;
+  // 1. Direct Airtable API (Base + Tables)
+  if (airtableConfig?.token && airtableConfig?.baseId) {
+    try {
+      const isVip = lead.status === 'vip_privilege_claimed';
+      const tableId = isVip
+        ? airtableConfig.vipTableId || 'tblGXJsK7tQWqf0kP'
+        : airtableConfig.bookingsTableId || 'tblzJVBkuxP6xSINF';
 
-  try {
-    const payload = {
-      timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-      referenceCode: lead.referenceCode,
-      clientName: lead.clientName,
-      clientPhone: lead.clientPhone,
-      clientEmail: lead.clientEmail,
-      ritualName: lead.ritualName,
-      duration: lead.duration,
-      examplePrice: lead.examplePrice,
-      preferredDate: lead.preferredDate,
-      preferredTime: lead.preferredTime,
-      status:
-        lead.status === 'vip_privilege_claimed'
-          ? 'VIP ₹500 Claimed'
-          : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
-            ? 'Form Filled (Needs Follow-up)'
-            : lead.status === 'dispatched_whatsapp'
-              ? 'Dispatched WhatsApp'
-              : lead.status,
-      notes: lead.notes || '',
-    };
+      const fields: Record<string, any> = isVip
+        ? {
+            'Voucher Code': lead.referenceCode || 'NOVA-VIP500',
+            'Client Name': lead.clientName,
+            Phone: lead.clientPhone,
+            Email: lead.clientEmail,
+            Ritual: lead.ritualName || 'Signature Facial',
+            'Voucher Value': 500,
+            Status: 'Active',
+            'Issue Date': new Date().toISOString().split('T')[0],
+            Notes: lead.notes || 'Claimed ₹500 VIP Welcome Privilege on NOVA Sanctuary website',
+          }
+        : {
+            'Client Name': lead.clientName,
+            Phone: lead.clientPhone,
+            Email: lead.clientEmail,
+            Ritual: lead.ritualName || 'Signature Facial',
+            'Preferred Date': lead.preferredDate || new Date().toISOString().split('T')[0],
+            'Preferred Time': lead.preferredTime || '10:30 AM',
+            Status: lead.status === 'dispatched_whatsapp' ? 'Confirmed' : 'Requested',
+            Notes: `Booking Ref: ${lead.referenceCode}${lead.duration ? ' · ' + lead.duration : ''}${lead.examplePrice ? ' · ' + lead.examplePrice : ''}${lead.notes ? ' · ' + lead.notes : ''}`,
+          };
 
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      mode: 'no-cors',
-    });
-    return true;
-  } catch (err) {
-    console.warn('sendLeadToAirtable error', err);
-    return false;
+      const res = await fetch(`https://api.airtable.com/v0/${airtableConfig.baseId}/${tableId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${airtableConfig.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          typecast: true,
+          records: [{ fields }],
+        }),
+      });
+
+      if (res.ok) {
+        return true;
+      }
+    } catch (e) {
+      console.warn('Airtable direct API dispatch failed', e);
+    }
   }
+
+  // 2. Airtable Webhook Fallback
+  if (webhookUrl) {
+    try {
+      const payload = {
+        timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        referenceCode: lead.referenceCode,
+        clientName: lead.clientName,
+        clientPhone: lead.clientPhone,
+        clientEmail: lead.clientEmail,
+        ritualName: lead.ritualName,
+        duration: lead.duration,
+        examplePrice: lead.examplePrice,
+        preferredDate: lead.preferredDate,
+        preferredTime: lead.preferredTime,
+        status:
+          lead.status === 'vip_privilege_claimed'
+            ? 'VIP ₹500 Claimed'
+            : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
+              ? 'Form Filled (Needs Follow-up)'
+              : lead.status === 'dispatched_whatsapp'
+                ? 'Dispatched WhatsApp'
+                : lead.status,
+        notes: lead.notes || '',
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors',
+      });
+      return true;
+    } catch (err) {
+      console.warn('sendLeadToAirtable webhook error', err);
+      return false;
+    }
+  }
+
+  return false;
 }
 
 /**
