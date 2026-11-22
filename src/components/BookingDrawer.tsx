@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { MediaAssetConfig, SALON_CONFIG } from '../data/salonData';
 import { MediaSlot } from './MediaSlot';
 import {
+  captureBookingLead,
+  saveCapturedLead,
+  updateLeadStatus,
+} from '../utils/leadCapture';
+import {
   AVAILABLE_TIME_SLOTS,
   BookingFormInput,
   BookingStep,
@@ -115,6 +120,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const [copied, setCopied] = useState(false);
   const [sentViaWhatsApp, setSentViaWhatsApp] = useState(false);
   const [showMessagePreview, setShowMessagePreview] = useState(false);
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
 
   const upcomingDates = useMemo(() => getUpcomingConsultationDates(6), []);
 
@@ -139,6 +145,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
       setSentViaWhatsApp(false);
       setCopied(false);
       setShowMessagePreview(false);
+      setCurrentLeadId(null);
 
       let raf2 = 0;
       const raf1 = window.requestAnimationFrame(() => {
@@ -233,6 +240,50 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     setStep(targetStep);
   };
 
+  // Progressive Lead Auto-Capture:
+  // As soon as the visitor enters their Name and Phone on Step 3, automatically save/update a draft lead
+  // even before they click "Confirm Consultation Details" or "Send via WhatsApp".
+  useEffect(() => {
+    const cleanPhone = form.clientPhone.replace(/\D/g, '');
+    if (form.clientName.trim().length >= 2 && cleanPhone.length >= 10 && !latestConfirmed) {
+      const activeCat = getCategoryById(form.categoryId) || SALON_CONFIG.treatmentCategories[0];
+      const rituals = getCategoryServices(activeCat.id);
+      const curRitual = rituals.find((r) => r.id === form.ritualId) || rituals[0];
+
+      const draftLead = saveCapturedLead({
+        id: currentLeadId || undefined,
+        referenceCode: `LEAD-${cleanPhone.slice(-4)}`,
+        clientName: form.clientName.trim(),
+        clientPhone: form.clientPhone.trim(),
+        clientEmail: form.clientEmail.trim() || 'Not specified',
+        ritualName: curRitual?.name || 'Consultation Ritual',
+        categoryId: activeCat.id,
+        duration: curRitual?.duration || '60 min',
+        examplePrice: curRitual?.examplePrice || '₹3,000',
+        preferredDate: form.preferredDate || 'Upcoming',
+        preferredTime: form.preferredTime || '11:00 AM',
+        notes: form.notes || '',
+        status: 'draft_entered',
+        sentNotification: false,
+      });
+
+      if (!currentLeadId) {
+        setCurrentLeadId(draftLead.id);
+      }
+    }
+  }, [
+    form.clientName,
+    form.clientPhone,
+    form.clientEmail,
+    form.preferredDate,
+    form.preferredTime,
+    form.ritualId,
+    form.categoryId,
+    form.notes,
+    latestConfirmed,
+    currentLeadId,
+  ]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validation = validateBookingForm(form);
@@ -247,6 +298,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     }
 
     const record = createBookingRecord(form);
+    // Instant lead capture & background dispatch to reception
+    const captured = captureBookingLead(record, 'confirmed_on_site');
+    setCurrentLeadId(captured.id);
     setLatestConfirmed(record);
     onBookingConfirmed(record);
   };
@@ -258,6 +312,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     setSentViaWhatsApp(false);
     setCopied(false);
     setShowMessagePreview(false);
+    setCurrentLeadId(null);
   };
 
   const selectedDateDisplay =
@@ -509,6 +564,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                           if (typeof navigator !== 'undefined' && navigator.clipboard) {
                             navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
                           }
+                          if (currentLeadId) {
+                            updateLeadStatus(currentLeadId, 'dispatched_whatsapp');
+                          }
                           setCopied(true);
                           setSentViaWhatsApp(true);
                           window.setTimeout(() => setCopied(false), 3000);
@@ -537,6 +595,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                           if (typeof navigator !== 'undefined' && navigator.clipboard) {
                             navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
                           }
+                          if (currentLeadId) {
+                            updateLeadStatus(currentLeadId, 'dispatched_whatsapp');
+                          }
                           setCopied(true);
                           setSentViaWhatsApp(true);
                           window.setTimeout(() => setCopied(false), 3000);
@@ -554,6 +615,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                           if (typeof navigator !== 'undefined' && navigator.clipboard) {
                             navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
                           }
+                          if (currentLeadId) {
+                            updateLeadStatus(currentLeadId, 'dispatched_whatsapp');
+                          }
                           setCopied(true);
                           setSentViaWhatsApp(true);
                           window.setTimeout(() => setCopied(false), 3000);
@@ -567,6 +631,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                       {/* Email Option */}
                       <a
                         href={generateEmailBookingUrl(latestConfirmed)}
+                        onClick={() => {
+                          if (currentLeadId) {
+                            updateLeadStatus(currentLeadId, 'dispatched_email');
+                          }
+                        }}
                         className="font-basel inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10.5px] uppercase tracking-[0.08em] border border-[#18224B]/20 bg-white hover:bg-[#18224B] hover:text-[#FBF9F5] text-[#18224B] transition-colors whitespace-nowrap cursor-pointer text-center"
                       >
                         <span>✉️</span>

@@ -13,6 +13,7 @@ import { InteractiveChapters } from './components/InteractiveChapters';
 import { TreatmentsSection } from './components/TreatmentsSection';
 import { AboutSection } from './components/AboutSection';
 import { BookingDrawer } from './components/BookingDrawer';
+import { ConciergeLedgerModal } from './components/ConciergeLedgerModal';
 import { Footer } from './components/Footer';
 import { InteractiveNovaWordmark } from './components/InteractiveNovaWordmark';
 import { PageTransitionCurtain } from './components/PageTransitionCurtain';
@@ -42,6 +43,7 @@ export default function App() {
     ritualId?: string;
   }>({});
   const [savedBookings, setSavedBookings] = useState<ConfirmedDemoBooking[]>([]);
+  const [conciergeLedgerOpen, setConciergeLedgerOpen] = useState(false);
   const [transitionPhase, setTransitionPhase] = useState<TransitionPhase>('idle');
   const [pendingPage, setPendingPage] = useState<ActivePage | null>(null);
 
@@ -51,6 +53,27 @@ export default function App() {
   const mainRef = useRef<HTMLElement | null>(null);
   const transitionCurtainRef = useRef<HTMLDivElement | null>(null);
   const transitionTlRef = useRef<gsap.core.Timeline | null>(null);
+
+  useEffect(() => {
+    // Open Concierge Leads Ledger if ?admin=leads or #leads is present in URL
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === 'leads' || window.location.hash === '#leads') {
+        setConciergeLedgerOpen(true);
+      }
+    }
+
+    // Global shortcut: Ctrl+Shift+L or Cmd+Shift+L to view leads ledger
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+        e.preventDefault();
+        setConciergeLedgerOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (openingStage === 'complete') return;
@@ -634,6 +657,7 @@ export default function App() {
       <Footer
         onOpenBooking={() => handleOpenBooking()}
         onNavigatePage={handleNavigatePage}
+        onOpenConciergeLedger={() => setConciergeLedgerOpen(true)}
       />
 
       {/* INTERACTIVE APPOINTMENT BOOKING DRAWER */}
@@ -644,6 +668,12 @@ export default function App() {
         onClose={() => setBookingOpen(false)}
         onBookingConfirmed={handleBookingConfirmed}
         savedBookings={savedBookings}
+      />
+
+      {/* RECEPTION CONCIERGE LEADS LEDGER MODAL */}
+      <ConciergeLedgerModal
+        isOpen={conciergeLedgerOpen}
+        onClose={() => setConciergeLedgerOpen(false)}
       />
 
       {/* RISING ALABASTER CURTAIN PAGE TRANSITION LAYER */}

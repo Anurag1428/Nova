@@ -7,6 +7,7 @@ import { NavHoverLink } from './NavHoverLink';
 interface FooterProps {
   onOpenBooking: () => void;
   onNavigatePage: (page: ActivePage, sectionId?: string) => void;
+  onOpenConciergeLedger?: () => void;
 }
 
 /**
@@ -15,7 +16,7 @@ interface FooterProps {
  * - Upper section on warm alabaster (#FBF9F5) with midnight navy (#18224B) contact & hours tables
  * - Lower full-bleed studio cyclorama with the rolling pearlescent marble sphere engraved with HERSHITA
  */
-export const Footer: React.FC<FooterProps> = ({ onOpenBooking, onNavigatePage }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenBooking, onNavigatePage, onOpenConciergeLedger }) => {
   const { brand, contact } = SALON_CONFIG;
 
   return (
@@ -181,7 +182,18 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking, onNavigatePage })
             <span className="inline-block h-2 w-2 rounded-full bg-[#E11D24]" aria-hidden="true" />
             <span>10:00AM – 9:00PM · LUCKNOW, UP</span>
           </div>
-          <div className="sm:col-span-5 flex flex-wrap sm:justify-end gap-8 text-[#18224B]/35">
+          <div className="sm:col-span-5 flex flex-wrap sm:justify-end gap-6 sm:gap-8 text-[#18224B]/35">
+            {onOpenConciergeLedger && (
+              <button
+                type="button"
+                onClick={onOpenConciergeLedger}
+                className="cursor-pointer text-[#9E7F4F] hover:text-[#18224B] transition-colors inline-flex items-center gap-1.5 font-medium"
+                title="Open Reception Concierge Desk & Abandoned Leads Ledger (Shortcut: Ctrl+Shift+L)"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                <span>Concierge Desk</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onOpenBooking}
