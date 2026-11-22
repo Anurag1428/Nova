@@ -34,6 +34,9 @@ export interface ConciergeSettings {
   receptionPhone: string;
   notificationEmail: string;
   webhookUrl: string;
+  callMeBotApiKey?: string;
+  telegramBotToken?: string;
+  telegramChatId?: string;
   soundAlertEnabled: boolean;
 }
 
@@ -41,6 +44,9 @@ export const DEFAULT_CONCIERGE_SETTINGS: ConciergeSettings = {
   receptionPhone: '917275256535',
   notificationEmail: 'info@novasalon.in',
   webhookUrl: '',
+  callMeBotApiKey: '',
+  telegramBotToken: '',
+  telegramChatId: '',
   soundAlertEnabled: true,
 };
 
@@ -356,6 +362,36 @@ export async function dispatchLeadNotification(
     } catch {
       // In case of network errors or adblock, silently continue
       channels.push('email_attempted');
+    }
+  }
+
+  // 3. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
+  if (settings.callMeBotApiKey) {
+    try {
+      const cleanAdminPhone = (settings.receptionPhone || '917275256535').replace(/\D/g, '');
+      const fullPhone = cleanAdminPhone.length === 10 ? `91${cleanAdminPhone}` : cleanAdminPhone;
+      const alertMsg = formatOwnerAlertText(lead);
+      await fetch(
+        `https://api.callmebot.com/whatsapp.php?phone=${fullPhone}&text=${encodeURIComponent(alertMsg)}&apikey=${encodeURIComponent(settings.callMeBotApiKey)}`,
+        { mode: 'no-cors' }
+      );
+      channels.push('admin_whatsapp_automated');
+    } catch (e) {
+      console.warn('Automated WhatsApp dispatch failed', e);
+    }
+  }
+
+  // 4. Automated Telegram Bot alert to Admin (if configured)
+  if (settings.telegramBotToken && settings.telegramChatId) {
+    try {
+      const alertMsg = formatOwnerAlertText(lead);
+      await fetch(
+        `https://api.telegram.org/bot${encodeURIComponent(settings.telegramBotToken)}/sendMessage?chat_id=${encodeURIComponent(settings.telegramChatId)}&text=${encodeURIComponent(alertMsg)}`,
+        { mode: 'no-cors' }
+      );
+      channels.push('admin_telegram_automated');
+    } catch (e) {
+      console.warn('Automated Telegram dispatch failed', e);
     }
   }
 

@@ -205,6 +205,42 @@ export const ConciergeLedgerModal: React.FC<ConciergeLedgerModalProps> = ({
                   Pings this webhook silently with full lead JSON payload on form completion.
                 </span>
               </div>
+
+              <div>
+                <label className="block text-[10.5px] uppercase tracking-[0.1em] text-[#18224B]/70 mb-1">
+                  Automated Admin WhatsApp API Key (CallMeBot)
+                </label>
+                <input
+                  type="text"
+                  value={settings.callMeBotApiKey || ''}
+                  onChange={(e) =>
+                    setSettings({ ...settings, callMeBotApiKey: e.target.value })
+                  }
+                  placeholder="e.g. 123456"
+                  className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-xs focus:outline-none focus:border-[#18224B]"
+                />
+                <span className="text-[10px] text-[#18224B]/50 mt-0.5 block">
+                  Enables automated background WhatsApp alerts sent straight to {settings.receptionPhone}.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-[10.5px] uppercase tracking-[0.1em] text-[#18224B]/70 mb-1">
+                  Reception Phone Number
+                </label>
+                <input
+                  type="text"
+                  value={settings.receptionPhone}
+                  onChange={(e) =>
+                    setSettings({ ...settings, receptionPhone: e.target.value })
+                  }
+                  placeholder="917275256535"
+                  className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-xs focus:outline-none focus:border-[#18224B]"
+                />
+                <span className="text-[10px] text-[#18224B]/50 mt-0.5 block">
+                  Admin destination phone number with country code (e.g. 917275256535).
+                </span>
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
