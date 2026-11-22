@@ -22,6 +22,9 @@ Mathematical solvers, validation logic, and physics choreography algorithms powe
 - `[bookingLogic.ts:validateBookingStep]`: Validates fields belonging to the active consultation step
 - `[bookingLogic.ts:getUpcomingConsultationDates]`: Generates deterministic upcoming date options starting from tomorrow
 - `[bookingLogic.ts:toggleRitualPreferenceNote]`: Toggles a bulleted preference string inside client notes
+- `[bookingLogic.ts:generateWhatsAppMessageText]`: Formats structured appointment dossier text for salon front desk
+- `[bookingLogic.ts:generateWhatsAppBookingUrl]`: Builds direct WhatsApp click-to-chat transmission link targeting Lucknow sanctuary (+91 9196355139)
+- `[bookingLogic.ts:generateEmailBookingUrl]`: Builds pre-filled mailto transmission link targeting salon reception email
 - `[pageTransition.ts:TransitionPhase]`: Navigation transition phase union (`'idle' | 'rising' | 'swapping' | 'revealing'`)
 - `[pageTransition.ts:PageTransitionTimings]`: Interface for curtain transition durations
 - `[pageTransition.ts:PAGE_TRANSITION_TIMINGS]`: Constant durations for rise (0.62s), hold (0.06s), and reveal (0.64s)

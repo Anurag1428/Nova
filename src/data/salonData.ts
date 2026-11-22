@@ -456,7 +456,7 @@ export const SALON_CONFIG = {
     team: [
       {
         id: 'member-1',
-        name: 'Hershita (Nova)',
+        name: 'Nova',
         role: 'Founder & Owner',
         specialty: 'Bespoke Skin Architecture & Bridal Artistry',
         bio: 'Founder & Owner of NOVA Unisex Salon. Leads private consultations, barrier-first skincare rituals, and bespoke bridal direction with calm, unhurried precision at Kingship by Kahlon in Lucknow.',

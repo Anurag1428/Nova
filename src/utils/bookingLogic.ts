@@ -295,3 +295,56 @@ export function toggleRitualPreferenceNote(currentNotes: string, preference: str
   return nextParts.join(' · ');
 }
 
+/**
+ * Formats a clean, readable text summary for transmitting the consultation request to salon reception.
+ */
+export function generateWhatsAppMessageText(booking: ConfirmedDemoBooking): string {
+  const lines = [
+    `*NOVA Sanctuary — Appointment Request*`,
+    `Ref: ${booking.referenceCode}`,
+    ``,
+    `• Guest: ${booking.clientName}`,
+    `• Phone: ${booking.clientPhone}`,
+    `• Email: ${booking.clientEmail}`,
+    `• Ritual: ${booking.ritualName} (${booking.duration} · ${booking.examplePrice})`,
+    `• Preferred Date: ${booking.preferredDate}`,
+    `• Time Window: ${booking.preferredTime}`,
+  ];
+
+  if (booking.notes) {
+    lines.push(`• Notes & Preferences: ${booking.notes}`);
+  }
+
+  lines.push(``);
+  lines.push(`Sanctuary: Kingship by Kahlon, Sector 16, Vrindavan Colony, Lucknow`);
+  lines.push(`Requested via novasalon.in`);
+
+  return lines.join('\n');
+}
+
+/**
+ * Builds a direct click-to-chat WhatsApp link targeting the salon reception number.
+ * Default target: 919196355139 (Lucknow sanctuary).
+ */
+export function generateWhatsAppBookingUrl(
+  booking: ConfirmedDemoBooking,
+  targetPhone = '919196355139'
+): string {
+  const cleanPhone = targetPhone.replace(/\D/g, '');
+  const text = generateWhatsAppMessageText(booking);
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Builds a pre-filled mailto link targeting the salon reception email.
+ */
+export function generateEmailBookingUrl(
+  booking: ConfirmedDemoBooking,
+  targetEmail = 'info@novasalon.in'
+): string {
+  const subject = `[NOVA Sanctuary Booking] ${booking.referenceCode} — ${booking.clientName}`;
+  const body = generateWhatsAppMessageText(booking);
+  return `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+

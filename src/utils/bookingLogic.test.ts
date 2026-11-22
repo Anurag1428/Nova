@@ -11,6 +11,9 @@ import {
   getUpcomingConsultationDates,
   toggleRitualPreferenceNote,
   createBookingRecord,
+  generateWhatsAppBookingUrl,
+  generateEmailBookingUrl,
+  generateWhatsAppMessageText,
 } from './bookingLogic';
 
 test('formatChapterCounter formats active chapter and bounds correctly', () => {
@@ -162,6 +165,35 @@ test('toggleRitualPreferenceNote adds and removes preference tags cleanly', () =
   const removed = toggleRitualPreferenceNote(second, 'Quiet silent ritual');
   assert.equal(removed, 'Sensitive skin');
 });
+
+test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon transmission links', () => {
+  const booking = createBookingRecord({
+    categoryId: 'facials',
+    ritualId: 'nova-signature-facial',
+    clientName: 'Priya Sharma',
+    clientEmail: 'priya@example.com',
+    clientPhone: '+91 9876543210',
+    preferredDate: '2026-11-25',
+    preferredTime: '11:00 AM',
+    notes: 'Sensitive skin · Bridal timeline',
+  });
+
+  const waUrl = generateWhatsAppBookingUrl(booking);
+  assert.ok(waUrl.startsWith('https://wa.me/919196355139?text='));
+  assert.ok(waUrl.includes('Priya%20Sharma'));
+  assert.ok(waUrl.includes('NOVA%20Signature%20Facial'));
+
+  const emailUrl = generateEmailBookingUrl(booking);
+  assert.ok(emailUrl.startsWith('mailto:info@novasalon.in?subject='));
+  assert.ok(emailUrl.includes('Priya%20Sharma'));
+
+  const messageText = generateWhatsAppMessageText(booking);
+  assert.ok(messageText.includes('*NOVA Sanctuary — Appointment Request*'));
+  assert.ok(messageText.includes('Priya Sharma'));
+  assert.ok(messageText.includes('Sensitive skin · Bridal timeline'));
+  assert.ok(messageText.includes('Kingship by Kahlon'));
+});
+
 
 
 

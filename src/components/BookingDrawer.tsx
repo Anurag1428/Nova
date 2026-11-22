@@ -12,6 +12,9 @@ import {
   getCategoryById,
   getCategoryServices,
   getUpcomingConsultationDates,
+  generateEmailBookingUrl,
+  generateWhatsAppBookingUrl,
+  generateWhatsAppMessageText,
   RITUAL_PREFERENCE_TAGS,
   toggleRitualPreferenceNote,
   validateBookingForm,
@@ -106,6 +109,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
 
   const [errors, setErrors] = useState<BookingValidationErrors>({});
   const [latestConfirmed, setLatestConfirmed] = useState<ConfirmedDemoBooking | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const upcomingDates = useMemo(() => getUpcomingConsultationDates(6), []);
 
@@ -441,8 +445,72 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                       We look forward to welcoming you, {latestConfirmed.clientName}.
                     </h2>
                     <p className="font-basel text-[13.5px] leading-[1.6] text-[#18224B]/72">
-                      Your private ritual request has been validated and prepared in this interactive preview. No live charge or external calendar transmission has been made yet.
+                      Your consultation dossier has been formatted and is ready for transmission directly to NOVA Reception at Kingship by Kahlon, Lucknow.
                     </p>
+                  </div>
+
+                  {/* Instant Message Dispatcher to Lucknow Reception */}
+                  <div className="border-2 border-[#18224B]/15 bg-[#FBF9F5] p-5 sm:p-7 space-y-5 shadow-[0_8px_32px_rgba(24,34,75,0.04)]">
+                    <div className="flex items-start gap-3">
+                      <span className="inline-flex h-3 w-3 rounded-full bg-[#10B981] mt-1 shrink-0 animate-pulse" aria-hidden="true" />
+                      <div>
+                        <h3 className="font-serif-editorial text-[1.25rem] text-[#18224B]">
+                          Transmit Dossier to Reception
+                        </h3>
+                        <p className="font-basel text-[12.5px] leading-[1.5] text-[#18224B]/75 mt-0.5">
+                          Tap below to send your complete appointment details directly to NOVA front desk on WhatsApp or via Email.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      {/* WhatsApp Transmission */}
+                      <a
+                        href={generateWhatsAppBookingUrl(latestConfirmed)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-basel inline-flex items-center justify-center gap-2 px-5 py-4 text-[11px] uppercase tracking-[0.12em] bg-[#10B981] text-white hover:bg-[#059669] transition-all whitespace-nowrap shadow-sm hover:shadow-md cursor-pointer"
+                      >
+                        <span className="text-sm">💬</span>
+                        <span>Send via WhatsApp</span>
+                        <span>→</span>
+                      </a>
+
+                      {/* Email Transmission */}
+                      <a
+                        href={generateEmailBookingUrl(latestConfirmed)}
+                        className="font-basel inline-flex items-center justify-center gap-2 px-5 py-4 text-[11px] uppercase tracking-[0.12em] border border-[#18224B] text-[#18224B] hover:bg-[#18224B] hover:text-[#FBF9F5] transition-colors whitespace-nowrap cursor-pointer"
+                      >
+                        <span className="text-sm">✉️</span>
+                        <span>Email to Reception</span>
+                        <span>→</span>
+                      </a>
+                    </div>
+
+                    {/* Direct Desk Call & Copy Details Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#18224B]/10 text-xs font-basel">
+                      <a
+                        href="tel:+919196355139"
+                        className="inline-flex items-center gap-1.5 text-[#18224B] hover:underline cursor-pointer"
+                      >
+                        <span>Call Reception:</span>
+                        <span className="font-mono-tabular font-medium">(+91) 9196355139</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed));
+                            setCopied(true);
+                            window.setTimeout(() => setCopied(false), 2500);
+                          }
+                        }}
+                        className="cursor-pointer text-[#18224B]/80 hover:text-[#18224B] transition-colors underline underline-offset-4"
+                      >
+                        {copied ? '✓ Booking Details Copied to Clipboard' : 'Copy Booking Details'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Invitation Card */}
