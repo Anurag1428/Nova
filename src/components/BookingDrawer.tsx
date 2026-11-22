@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MediaAssetConfig, SALON_CONFIG } from '../data/salonData';
 import { MediaSlot } from './MediaSlot';
 import {
   captureBookingLead,
   saveCapturedLead,
   updateLeadStatus,
+  dispatchLeadNotification,
 } from '../utils/leadCapture';
 import {
   AVAILABLE_TIME_SLOTS,
@@ -127,6 +128,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const [sentViaWhatsApp, setSentViaWhatsApp] = useState(false);
   const [showMessagePreview, setShowMessagePreview] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
+  const autoDispatchedDraftPhoneRef = useRef<string>('');
 
   const upcomingDates = useMemo(() => getUpcomingConsultationDates(6), []);
 
@@ -278,6 +280,19 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
 
       if (!currentLeadId) {
         setCurrentLeadId(draftLead.id);
+      }
+
+      // Auto-dispatch draft lead to Airtable/Sheet as soon as 10 digits are typed
+      if (autoDispatchedDraftPhoneRef.current !== cleanPhone) {
+        const timer = window.setTimeout(async () => {
+          autoDispatchedDraftPhoneRef.current = cleanPhone;
+          try {
+            await dispatchLeadNotification(draftLead);
+          } catch {
+            // Non-blocking
+          }
+        }, 800);
+        return () => window.clearTimeout(timer);
       }
     }
   }, [

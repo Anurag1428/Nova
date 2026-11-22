@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   saveCapturedLead,
   dispatchLeadNotification,
@@ -24,6 +24,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isClaimed, setIsClaimed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const autoCapturedPhoneRef = useRef<string>('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -33,6 +34,43 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
       }
     }
   }, [isOpen]);
+
+  // Real-time progressive auto-capture:
+  // If user enters 10 digits, dispatch to Airtable after 800ms even if they NEVER click unlock!
+  useEffect(() => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length >= 10 && autoCapturedPhoneRef.current !== cleanPhone && !isClaimed) {
+      const timer = window.setTimeout(async () => {
+        autoCapturedPhoneRef.current = cleanPhone;
+        const clientName = name.trim() || 'Sanctuary Guest';
+        const formattedPhone = cleanPhone.length === 10 ? `+91 ${cleanPhone}` : `+${cleanPhone}`;
+
+        const lead = saveCapturedLead({
+          referenceCode: VOUCHER_CODE,
+          clientName,
+          clientPhone: formattedPhone,
+          clientEmail: '',
+          ritualName: 'Signature Facial',
+          categoryId: 'vip',
+          duration: 'Flexible',
+          examplePrice: '₹500 Credit',
+          preferredDate: new Date().toISOString().split('T')[0],
+          preferredTime: 'Flexible',
+          notes: `VIP Privilege form filled (auto-captured before clicking unlock) · Voucher ${VOUCHER_CODE}`,
+          status: 'vip_privilege_claimed',
+          sentNotification: false,
+        });
+
+        try {
+          await dispatchLeadNotification(lead);
+        } catch {
+          // Non-blocking
+        }
+      }, 800);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [name, phone, isClaimed]);
 
   if (!isOpen) return null;
 
