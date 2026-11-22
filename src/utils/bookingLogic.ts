@@ -323,6 +323,62 @@ export function generateWhatsAppMessageText(booking: ConfirmedDemoBooking): stri
 }
 
 /**
+ * Smart device-aware WhatsApp URL:
+ * - On desktop/laptop: routes directly to web.whatsapp.com/send to bypass the download/intermediate page.
+ * - On mobile (iOS / Android): routes to wa.me to open the native WhatsApp mobile app instantly.
+ */
+export function getWhatsAppUrlForDevice(
+  booking: ConfirmedDemoBooking,
+  targetPhone = '917275256535'
+): string {
+  let cleanPhone = targetPhone.replace(/\D/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = `91${cleanPhone}`;
+  }
+  const text = generateWhatsAppMessageText(booking);
+  const isMobile =
+    typeof navigator !== 'undefined' &&
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  if (isMobile) {
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+  }
+  return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Direct WhatsApp Web URL (bypasses the download/intermediate landing page on desktop).
+ */
+export function generateWhatsAppWebUrl(
+  booking: ConfirmedDemoBooking,
+  targetPhone = '917275256535'
+): string {
+  let cleanPhone = targetPhone.replace(/\D/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = `91${cleanPhone}`;
+  }
+  const text = generateWhatsAppMessageText(booking);
+  return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Direct WhatsApp Desktop Application protocol URL (opens native PC/Mac WhatsApp desktop app directly).
+ */
+export function generateWhatsAppDesktopAppUrl(
+  booking: ConfirmedDemoBooking,
+  targetPhone = '917275256535'
+): string {
+  let cleanPhone = targetPhone.replace(/\D/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = `91${cleanPhone}`;
+  }
+  const text = generateWhatsAppMessageText(booking);
+  return `whatsapp://send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+}
+
+/**
  * Builds a direct click-to-chat WhatsApp link targeting the salon reception number.
  * Default target: 917275256535 (testing reception number; Lucknow sanctuary).
  */

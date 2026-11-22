@@ -14,6 +14,9 @@ import {
   generateWhatsAppBookingUrl,
   generateEmailBookingUrl,
   generateWhatsAppMessageText,
+  generateWhatsAppWebUrl,
+  generateWhatsAppDesktopAppUrl,
+  getWhatsAppUrlForDevice,
 } from './bookingLogic';
 
 test('formatChapterCounter formats active chapter and bounds correctly', () => {
@@ -192,6 +195,20 @@ test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon
   assert.ok(messageText.includes('Priya Sharma'));
   assert.ok(messageText.includes('Sensitive skin · Bridal timeline'));
   assert.ok(messageText.includes('Kingship by Kahlon'));
+
+  const webUrl = generateWhatsAppWebUrl(booking);
+  assert.ok(webUrl.startsWith('https://web.whatsapp.com/send?phone=917275256535&text='));
+  assert.ok(webUrl.includes('Priya%20Sharma'));
+
+  const appUrl = generateWhatsAppDesktopAppUrl(booking);
+  assert.ok(appUrl.startsWith('whatsapp://send?phone=917275256535&text='));
+  assert.ok(appUrl.includes('Priya%20Sharma'));
+
+  const deviceUrl = getWhatsAppUrlForDevice(booking);
+  assert.ok(
+    deviceUrl.startsWith('https://web.whatsapp.com/send?') ||
+    deviceUrl.startsWith('https://wa.me/')
+  );
 });
 
 

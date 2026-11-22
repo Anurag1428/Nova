@@ -15,6 +15,9 @@ import {
   generateEmailBookingUrl,
   generateWhatsAppBookingUrl,
   generateWhatsAppMessageText,
+  generateWhatsAppWebUrl,
+  generateWhatsAppDesktopAppUrl,
+  getWhatsAppUrlForDevice,
   RITUAL_PREFERENCE_TAGS,
   toggleRitualPreferenceNote,
   validateBookingForm,
@@ -110,6 +113,8 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const [errors, setErrors] = useState<BookingValidationErrors>({});
   const [latestConfirmed, setLatestConfirmed] = useState<ConfirmedDemoBooking | null>(null);
   const [copied, setCopied] = useState(false);
+  const [sentViaWhatsApp, setSentViaWhatsApp] = useState(false);
+  const [showMessagePreview, setShowMessagePreview] = useState(false);
 
   const upcomingDates = useMemo(() => getUpcomingConsultationDates(6), []);
 
@@ -131,6 +136,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
       setStep(1);
       setErrors({});
       setLatestConfirmed(null);
+      setSentViaWhatsApp(false);
+      setCopied(false);
+      setShowMessagePreview(false);
 
       let raf2 = 0;
       const raf1 = window.requestAnimationFrame(() => {
@@ -247,6 +255,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     setLatestConfirmed(null);
     setStep(1);
     setErrors({});
+    setSentViaWhatsApp(false);
+    setCopied(false);
+    setShowMessagePreview(false);
   };
 
   const selectedDateDisplay =
@@ -449,52 +460,128 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     </p>
                   </div>
 
-                  {/* Instant Message Dispatcher to Lucknow Reception */}
-                  <div className="border-2 border-[#18224B]/15 bg-[#FBF9F5] p-5 sm:p-7 space-y-5 shadow-[0_8px_32px_rgba(24,34,75,0.04)]">
-                    <div className="flex items-start gap-3">
-                      <span className="inline-flex h-3 w-3 rounded-full bg-[#10B981] mt-1 shrink-0 animate-pulse" aria-hidden="true" />
-                      <div>
-                        <h3 className="font-serif-editorial text-[1.25rem] text-[#18224B]">
-                          Transmit Dossier to Reception
+                  {/* Luxury Reception Dispatch Station */}
+                  <div className="border border-[#C5B393]/75 bg-[#F9F7F2] p-5 sm:p-7 space-y-5 shadow-[0_8px_32px_rgba(24,34,75,0.05)]">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#10B981] animate-pulse" aria-hidden="true" />
+                          <span className="font-basel text-[10px] uppercase tracking-[0.16em] text-[#059669] font-medium">
+                            Direct Reception Dispatch
+                          </span>
+                        </div>
+                        <h3 className="font-serif-editorial text-[1.35rem] text-[#18224B]">
+                          Send Booking to Reception
                         </h3>
-                        <p className="font-basel text-[12.5px] leading-[1.5] text-[#18224B]/75 mt-0.5">
-                          Tap below to send your complete appointment details directly to NOVA front desk on WhatsApp or via Email.
+                        <p className="font-basel text-[12.5px] leading-[1.5] text-[#18224B]/75 max-w-[480px]">
+                          Transmit your pre-filled reservation directly to NOVA Front Desk (<span className="font-mono-tabular font-medium text-[#18224B]">+91 72752 56535</span>) via WhatsApp or Email. We confirm every appointment personally.
                         </p>
                       </div>
+                      <span className="hidden sm:inline-block font-mono-tabular text-[11px] text-[#18224B]/60 border border-[#18224B]/15 px-2.5 py-1">
+                        LUCKNOW
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      {/* WhatsApp Transmission */}
+                    {/* Instant Feedback Banner */}
+                    {sentViaWhatsApp && (
+                      <div className="bg-[#ECFDF5] border border-[#10B981]/35 p-3.5 text-[12.5px] font-basel text-[#065F46] flex items-center justify-between gap-3 shadow-xs">
+                        <div className="flex items-center gap-2.5">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#10B981] text-white text-xs shrink-0">✓</span>
+                          <span>Opening WhatsApp chat with reception. Full appointment details are also copied to your clipboard!</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSentViaWhatsApp(false)}
+                          className="text-[#065F46]/75 hover:text-[#065F46] text-xs uppercase cursor-pointer"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Primary WhatsApp Action */}
+                    <div className="space-y-2">
                       <a
-                        href={generateWhatsAppBookingUrl(latestConfirmed)}
+                        href={getWhatsAppUrlForDevice(latestConfirmed, '917275256535')}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-basel inline-flex items-center justify-center gap-2 px-5 py-4 text-[11px] uppercase tracking-[0.12em] bg-[#10B981] text-white hover:bg-[#059669] transition-all whitespace-nowrap shadow-sm hover:shadow-md cursor-pointer"
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
+                          }
+                          setCopied(true);
+                          setSentViaWhatsApp(true);
+                          window.setTimeout(() => setCopied(false), 3000);
+                        }}
+                        className="group w-full font-basel inline-flex items-center justify-center gap-3 px-6 py-4 text-[12px] uppercase tracking-[0.14em] bg-[#10B981] text-white hover:bg-[#059669] transition-all shadow-sm hover:shadow-md cursor-pointer font-medium"
                       >
-                        <span className="text-sm">💬</span>
-                        <span>Send via WhatsApp</span>
-                        <span>→</span>
+                        <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-5.805 1.524zm6.208-3.82c1.62.96 3.238 1.455 5.097 1.456 5.485 0 9.948-4.463 9.951-9.95.001-2.658-1.034-5.158-2.91-7.036-1.877-1.878-4.376-2.912-7.037-2.914-5.487 0-9.95 4.463-9.952 9.951-.001 1.932.551 3.825 1.597 5.491l-.973 3.553 3.827-.551zm11.23-7.51c-.139-.232-.511-.372-1.069-.65-.558-.279-3.298-1.627-3.809-1.813-.512-.186-.883-.279-1.255.279-.372.558-1.441 1.813-1.766 2.185-.325.372-.65.418-1.208.14-.558-.279-2.356-.869-4.488-2.77-1.659-1.48-2.78-3.308-3.105-3.866-.325-.558-.035-.859.244-1.137.251-.25.558-.65.837-.975.279-.326.372-.558.558-.93.186-.372.093-.697-.046-.976-.139-.279-1.255-3.021-1.719-4.137-.453-1.087-.912-.94-1.255-.957l-1.07-.018c-.372 0-.976.139-1.487.697-.512.558-1.952 1.906-1.952 4.65 0 2.743 1.998 5.393 2.277 5.765.279.372 3.931 6.002 9.524 8.418 1.33.575 2.368.919 3.178 1.176 1.336.424 2.552.364 3.513.221 1.072-.16 3.298-1.348 3.763-2.65.465-1.302.465-2.417.326-2.65z"/>
+                        </svg>
+                        <span>Send Booking Request via WhatsApp</span>
+                        <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                      </a>
+                      <p className="font-basel text-[11px] text-center text-[#18224B]/60">
+                        Smart Routing: Desktop opens WhatsApp Web chat directly · Mobile opens WhatsApp app
+                      </p>
+                    </div>
+
+                    {/* Secondary Transmission Options & Desktop Alternatives */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                      {/* WhatsApp Web Direct Link */}
+                      <a
+                        href={generateWhatsAppWebUrl(latestConfirmed, '917275256535')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
+                          }
+                          setCopied(true);
+                          setSentViaWhatsApp(true);
+                          window.setTimeout(() => setCopied(false), 3000);
+                        }}
+                        className="font-basel inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10.5px] uppercase tracking-[0.08em] border border-[#18224B]/20 bg-white hover:bg-[#18224B] hover:text-[#FBF9F5] text-[#18224B] transition-colors whitespace-nowrap cursor-pointer text-center"
+                      >
+                        <span>🌐</span>
+                        <span>WhatsApp Web</span>
                       </a>
 
-                      {/* Email Transmission */}
+                      {/* WhatsApp PC App Direct Link */}
+                      <a
+                        href={generateWhatsAppDesktopAppUrl(latestConfirmed, '917275256535')}
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(generateWhatsAppMessageText(latestConfirmed)).catch(() => {});
+                          }
+                          setCopied(true);
+                          setSentViaWhatsApp(true);
+                          window.setTimeout(() => setCopied(false), 3000);
+                        }}
+                        className="font-basel inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10.5px] uppercase tracking-[0.08em] border border-[#18224B]/20 bg-white hover:bg-[#18224B] hover:text-[#FBF9F5] text-[#18224B] transition-colors whitespace-nowrap cursor-pointer text-center"
+                      >
+                        <span>💻</span>
+                        <span>WhatsApp PC App</span>
+                      </a>
+
+                      {/* Email Option */}
                       <a
                         href={generateEmailBookingUrl(latestConfirmed)}
-                        className="font-basel inline-flex items-center justify-center gap-2 px-5 py-4 text-[11px] uppercase tracking-[0.12em] border border-[#18224B] text-[#18224B] hover:bg-[#18224B] hover:text-[#FBF9F5] transition-colors whitespace-nowrap cursor-pointer"
+                        className="font-basel inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10.5px] uppercase tracking-[0.08em] border border-[#18224B]/20 bg-white hover:bg-[#18224B] hover:text-[#FBF9F5] text-[#18224B] transition-colors whitespace-nowrap cursor-pointer text-center"
                       >
-                        <span className="text-sm">✉️</span>
-                        <span>Email to Reception</span>
-                        <span>→</span>
+                        <span>✉️</span>
+                        <span>Email Request</span>
                       </a>
                     </div>
 
-                    {/* Direct Desk Call & Copy Details Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#18224B]/10 text-xs font-basel">
+                    {/* Quick Call & Copy Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#18224B]/10 text-xs font-basel">
                       <a
                         href="tel:+917275256535"
                         className="inline-flex items-center gap-1.5 text-[#18224B] hover:underline cursor-pointer"
                       >
-                        <span>Call Reception:</span>
-                        <span className="font-mono-tabular font-medium">(+91) 7275256535</span>
+                        <span className="text-[#18224B]/60">Call Reception:</span>
+                        <span className="font-mono-tabular font-medium text-[#18224B]">(+91) 7275256535</span>
                       </a>
 
                       <button
@@ -506,10 +593,28 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                             window.setTimeout(() => setCopied(false), 2500);
                           }
                         }}
-                        className="cursor-pointer text-[#18224B]/80 hover:text-[#18224B] transition-colors underline underline-offset-4"
+                        className="cursor-pointer font-medium text-[#18224B] hover:text-[#059669] transition-colors underline underline-offset-4"
                       >
-                        {copied ? '✓ Booking Details Copied to Clipboard' : 'Copy Booking Details'}
+                        {copied ? '✓ Booking Details Copied to Clipboard' : '📋 Copy Full Message Text'}
                       </button>
+                    </div>
+
+                    {/* Collapsible Message Preview */}
+                    <div className="pt-2 border-t border-[#18224B]/10">
+                      <button
+                        type="button"
+                        onClick={() => setShowMessagePreview((prev) => !prev)}
+                        className="cursor-pointer text-[11px] font-basel uppercase tracking-[0.1em] text-[#18224B]/70 hover:text-[#18224B] flex items-center justify-between w-full"
+                      >
+                        <span>{showMessagePreview ? '▾ Hide Message Preview' : '▸ View Pre-Filled Message Text'}</span>
+                        <span className="text-[10px] text-[#18224B]/50">{showMessagePreview ? 'Close' : 'Expand'}</span>
+                      </button>
+
+                      {showMessagePreview && (
+                        <div className="mt-3 p-3.5 bg-white border border-[#18224B]/12 text-[12px] font-mono leading-relaxed text-[#18224B]/80 whitespace-pre-line select-all">
+                          {generateWhatsAppMessageText(latestConfirmed)}
+                        </div>
+                      )}
                     </div>
                   </div>
 
