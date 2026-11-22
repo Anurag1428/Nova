@@ -33,6 +33,9 @@ interface BookingDrawerProps {
   isOpen: boolean;
   initialCategoryId?: string;
   initialRitualId?: string;
+  initialClientName?: string;
+  initialClientPhone?: string;
+  initialNotes?: string;
   onClose: () => void;
   onBookingConfirmed: (booking: ConfirmedDemoBooking) => void;
   savedBookings: ConfirmedDemoBooking[];
@@ -92,6 +95,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   isOpen,
   initialCategoryId,
   initialRitualId,
+  initialClientName,
+  initialClientPhone,
+  initialNotes,
   onClose,
   onBookingConfirmed,
   savedBookings,
@@ -107,12 +113,12 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   const [form, setForm] = useState<BookingFormInput>({
     categoryId: defaultCategory,
     ritualId: defaultRitual,
-    clientName: '',
+    clientName: initialClientName || '',
     clientEmail: '',
-    clientPhone: '',
+    clientPhone: initialClientPhone || '',
     preferredDate: '',
     preferredTime: AVAILABLE_TIME_SLOTS[1],
-    notes: '',
+    notes: initialNotes || '',
   });
 
   const [errors, setErrors] = useState<BookingValidationErrors>({});
@@ -138,6 +144,9 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
         ...prev,
         categoryId: catId,
         ritualId: ritId,
+        clientName: initialClientName || prev.clientName || '',
+        clientPhone: initialClientPhone || prev.clientPhone || '',
+        notes: initialNotes || prev.notes || '',
       }));
       setStep(1);
       setErrors({});
@@ -1103,7 +1112,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                           </label>
                           <input
                             id="booking-name"
+                            name="name"
                             type="text"
+                            autoComplete="name"
+                            autoCapitalize="words"
+                            spellCheck={false}
                             placeholder="e.g. Ananya Sharma"
                             value={form.clientName}
                             onChange={(e) => {
@@ -1129,7 +1142,12 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                             </label>
                             <input
                               id="booking-email"
+                              name="email"
                               type="email"
+                              autoComplete="email"
+                              inputMode="email"
+                              autoCapitalize="none"
+                              spellCheck={false}
                               placeholder="ananya@example.com"
                               value={form.clientEmail}
                               onChange={(e) => {
@@ -1154,7 +1172,10 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                             </label>
                             <input
                               id="booking-phone"
+                              name="tel"
                               type="tel"
+                              autoComplete="tel"
+                              inputMode="tel"
                               placeholder="+91 98765 43210"
                               value={form.clientPhone}
                               onChange={(e) => {

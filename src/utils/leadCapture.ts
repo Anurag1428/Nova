@@ -1,11 +1,12 @@
 import { ConfirmedDemoBooking, generateWhatsAppMessageText } from './bookingLogic';
 
 export type LeadStatus =
-  | 'draft_entered'       // visitor filled name and phone in step 3
-  | 'confirmed_on_site'   // reached confirmation screen, but did NOT click send via WhatsApp yet!
-  | 'dispatched_whatsapp' // clicked "Send via WhatsApp"
-  | 'dispatched_email'    // clicked "Email to Reception"
-  | 'contacted';          // owner marked as contacted/resolved
+  | 'draft_entered'          // visitor filled name and phone in step 3
+  | 'confirmed_on_site'      // reached confirmation screen, but did NOT click send via WhatsApp yet!
+  | 'dispatched_whatsapp'    // clicked "Send via WhatsApp"
+  | 'dispatched_email'       // clicked "Email to Reception"
+  | 'vip_privilege_claimed'  // claimed ₹500 welcome voucher lead magnet
+  | 'contacted';             // owner marked as contacted/resolved
 
 export interface CapturedLeadRecord {
   id: string;
@@ -285,10 +286,12 @@ export function captureBookingLead(
  * Formats a clean notification summary for the owner.
  */
 export function formatOwnerAlertText(lead: CapturedLeadRecord): string {
-  const isAbandoned = lead.status === 'confirmed_on_site' || lead.status === 'draft_entered';
-  const statusHeadline = isAbandoned
-    ? '⚠️ [HOT LEAD] Customer filled booking form but did NOT send WhatsApp yet!'
-    : '✅ [NEW BOOKING] Customer requested appointment transmission';
+  let statusHeadline = '✅ [NEW BOOKING] Customer requested appointment transmission';
+  if (lead.status === 'vip_privilege_claimed') {
+    statusHeadline = '🎁 [VIP PRIVILEGE CLAIMED] Guest unlocked ₹500 Welcome Voucher! Call/WhatsApp to schedule ritual.';
+  } else if (lead.status === 'confirmed_on_site' || lead.status === 'draft_entered') {
+    statusHeadline = '⚠️ [HOT LEAD] Customer filled booking form but did NOT send WhatsApp yet!';
+  }
 
   return [
     statusHeadline,
