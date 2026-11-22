@@ -37,6 +37,7 @@ export interface ConciergeSettings {
   notificationEmail: string;
   webhookUrl: string;
   googleSheetsWebhookUrl?: string;
+  airtableWebhookUrl?: string;
   securityPin: string;
   callMeBotApiKey?: string;
   telegramBotToken?: string;
@@ -49,6 +50,7 @@ export const DEFAULT_CONCIERGE_SETTINGS: ConciergeSettings = {
   notificationEmail: 'info@novasalon.in',
   webhookUrl: '',
   googleSheetsWebhookUrl: '',
+  airtableWebhookUrl: '',
   securityPin: '1428',
   callMeBotApiKey: '',
   telegramBotToken: '',
@@ -431,7 +433,48 @@ export async function dispatchLeadNotification(
     }
   }
 
-  // 4. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
+  // 4. Automated dispatch directly to Owner's Airtable CRM (via Airtable Webhook Automation)
+  const airtableUrl =
+    settings.airtableWebhookUrl ||
+    (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.airtableWebhookUrl);
+
+  if (airtableUrl) {
+    try {
+      const airtablePayload = {
+        timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        referenceCode: lead.referenceCode,
+        clientName: lead.clientName,
+        clientPhone: lead.clientPhone,
+        clientEmail: lead.clientEmail,
+        ritualName: lead.ritualName,
+        duration: lead.duration,
+        examplePrice: lead.examplePrice,
+        preferredDate: lead.preferredDate,
+        preferredTime: lead.preferredTime,
+        status:
+          lead.status === 'vip_privilege_claimed'
+            ? 'VIP ₹500 Claimed'
+            : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
+              ? 'Form Filled (Needs Follow-up)'
+              : lead.status === 'dispatched_whatsapp'
+                ? 'Dispatched WhatsApp'
+                : lead.status,
+        notes: lead.notes || '',
+      };
+
+      await fetch(airtableUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(airtablePayload),
+        mode: 'no-cors',
+      });
+      channels.push('airtable');
+    } catch (e) {
+      console.warn('Airtable dispatch failed', e);
+    }
+  }
+
+  // 5. Automated WhatsApp message to Admin's WhatsApp (+91 7275256535) via CallMeBot API
   if (settings.callMeBotApiKey) {
     try {
       const cleanAdminPhone = (settings.receptionPhone || '917275256535').replace(/\D/g, '');
@@ -560,6 +603,56 @@ export async function sendLeadToGoogleSheet(
     return true;
   } catch (err) {
     console.warn('sendLeadToGoogleSheet error', err);
+    return false;
+  }
+}
+
+/**
+ * Sends a captured lead row directly to the owner's Airtable Webhook Automation.
+ */
+export async function sendLeadToAirtable(
+  lead: CapturedLeadRecord,
+  customWebhookUrl?: string
+): Promise<boolean> {
+  const url =
+    customWebhookUrl ||
+    getConciergeSettings().airtableWebhookUrl ||
+    (typeof SALON_CONFIG !== 'undefined' && (SALON_CONFIG as any).integrations?.airtableWebhookUrl);
+
+  if (!url) return false;
+
+  try {
+    const payload = {
+      timestamp: new Date(lead.capturedAtIso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+      referenceCode: lead.referenceCode,
+      clientName: lead.clientName,
+      clientPhone: lead.clientPhone,
+      clientEmail: lead.clientEmail,
+      ritualName: lead.ritualName,
+      duration: lead.duration,
+      examplePrice: lead.examplePrice,
+      preferredDate: lead.preferredDate,
+      preferredTime: lead.preferredTime,
+      status:
+        lead.status === 'vip_privilege_claimed'
+          ? 'VIP ₹500 Claimed'
+          : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
+            ? 'Form Filled (Needs Follow-up)'
+            : lead.status === 'dispatched_whatsapp'
+              ? 'Dispatched WhatsApp'
+              : lead.status,
+      notes: lead.notes || '',
+    };
+
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      mode: 'no-cors',
+    });
+    return true;
+  } catch (err) {
+    console.warn('sendLeadToAirtable error', err);
     return false;
   }
 }

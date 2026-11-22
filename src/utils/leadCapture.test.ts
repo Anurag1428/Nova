@@ -13,6 +13,7 @@ import {
   verifyConciergePin,
   updateConciergePin,
   sendLeadToGoogleSheet,
+  sendLeadToAirtable,
   GOOGLE_APPS_SCRIPT_TEMPLATE,
 } from './leadCapture';
 
@@ -214,6 +215,28 @@ test('sendLeadToGoogleSheet safely handles missing webhook URL', async () => {
     capturedAtIso: new Date().toISOString(),
     updatedAtIso: new Date().toISOString(),
     status: 'confirmed_on_site',
+    sentNotification: false,
+  }, '');
+  assert.equal(res, false);
+});
+
+test('sendLeadToAirtable safely handles missing webhook URL', async () => {
+  const res = await sendLeadToAirtable({
+    id: 'test-airtable',
+    referenceCode: 'NOVA-AT01',
+    clientName: 'Test Guest',
+    clientPhone: '+91 7275256535',
+    clientEmail: 'test@example.com',
+    ritualName: 'The NOVA Signature Facial',
+    categoryId: 'facials',
+    duration: '75 min',
+    examplePrice: '₹4,100',
+    preferredDate: '2026-11-26',
+    preferredTime: '11:00 AM',
+    notes: '',
+    capturedAtIso: new Date().toISOString(),
+    updatedAtIso: new Date().toISOString(),
+    status: 'vip_privilege_claimed',
     sentNotification: false,
   }, '');
   assert.equal(res, false);

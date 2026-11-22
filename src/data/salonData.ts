@@ -494,5 +494,8 @@ export const SALON_CONFIG = {
     // Google Sheets Webhook: every booking & VIP lead is automatically appended to owner's Google Sheet
     googleSheetsWebhookUrl:
       (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL) || '',
+    // Airtable Webhook: every booking & VIP lead is automatically appended to owner's Airtable CRM
+    airtableWebhookUrl:
+      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_WEBHOOK_URL) || '',
   },
 };
