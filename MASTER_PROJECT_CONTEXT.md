@@ -17,9 +17,7 @@
 
 ---
 
-## 2. Completed Milestones & Work History
-
-### A. Point B Updates (From AI Studio)
+## 2. Completed Milestones & Work History (Point B from AI Studio)
 * **Editorial About & Sanctuary Page (`AboutSection.tsx`):**
   - Full-viewport sunlit lounge hero with split *"Evolving / with you."* horizon headline and floating hydrangea inset (`about_hydrangea_inset_1795344837528.jpg`).
   - Alabaster (`#FBF9F5`) manifesto band with left `"ABOUT"` kicker, indented serif philosophy, and Lucknow sanctuary details.
@@ -33,12 +31,6 @@
   - 25/25 unit tests verified.
   - 1440x900 desktop responsive layout verified in Chromium.
 
-### B. Antigravity Custom Work
-* **Founder Real Identity Portrait (`public/images/nova-founder-portrait.jpg`):**
-  - Genuine facial identity (eyes, nose, bone structure, smile) composited and feather-blended into the practitioner coat portrait.
-  - Seamless color temperature and lighting match with ambient studio background.
-  - Copied into master repository at `public/images/nova-founder-portrait.jpg`.
-
 ---
 
 ## 3. Directory & Component Architecture
@@ -46,7 +38,7 @@
 ```
 Maison-Aura-Sanctuary-Master/
 ├── src/
-│   ├── assets/images/       # High-res photography, insets, and portraits
+│   ├── assets/images/       # High-res photography, insets, and portraits from AI Studio
 │   ├── components/
 │   │   ├── AboutSection.tsx         # 323-line editorial About & Founder page with GSAP
 │   │   ├── BookingDrawer.tsx        # Interactive bespoke appointment booking modal
@@ -63,15 +55,15 @@ Maison-Aura-Sanctuary-Master/
 │   ├── App.tsx                      # Root application & view orchestration
 │   └── index.css                    # Tailwind CSS v4 styling & tokens
 ├── public/
-│   ├── images/                      # Production public images (including nova-founder-portrait.jpg)
+│   ├── images/                      # Production public images
 │   └── videos/                      # Atmospheric background video assets
 └── MASTER_PROJECT_CONTEXT.md        # This unified project documentation
 ```
 
 ---
 
-## 4. Immediate Development Roadmap
-1. Connect the final real founder portrait (`public/images/nova-founder-portrait.jpg`) directly into `AboutSection.tsx` or `salonData.ts` as needed.
+## 4. Next Steps
+1. Review and refine any components or pages as requested.
 2. Complete booking drawer integration and appointment scheduling flow.
 3. Add smooth page transitions between the Home, About, Treatments, and Contact views.
 4. Prepare for production build and deployment.
