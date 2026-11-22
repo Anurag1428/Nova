@@ -590,20 +590,44 @@ export async function sendLeadToGoogleSheet(
  */
 export const GOOGLE_APPS_SCRIPT_TEMPLATE = `function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  // Auto-create headers & styling if sheet is brand new
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "Date & Time",
+      "Booking Ref",
+      "Customer Name",
+      "Phone Number",
+      "Email Address",
+      "Ritual / Service",
+      "Duration",
+      "Price",
+      "Preferred Date",
+      "Preferred Time",
+      "Status",
+      "Notes / Voucher"
+    ]);
+    var headerRange = sheet.getRange(1, 1, 1, 12);
+    headerRange.setBackground("#18224B");
+    headerRange.setFontColor("#FFFFFF");
+    headerRange.setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+
   var data = JSON.parse(e.postData.contents);
   sheet.appendRow([
-    data.timestamp,
-    data.referenceCode,
-    data.clientName,
-    data.clientPhone,
-    data.clientEmail,
-    data.ritualName,
-    data.duration,
-    data.examplePrice,
-    data.preferredDate,
-    data.preferredTime,
-    data.status,
-    data.notes
+    data.timestamp || new Date().toLocaleString(),
+    data.referenceCode || '',
+    data.clientName || '',
+    data.clientPhone || '',
+    data.clientEmail || '',
+    data.ritualName || '',
+    data.duration || '',
+    data.examplePrice || '',
+    data.preferredDate || '',
+    data.preferredTime || '',
+    data.status || '',
+    data.notes || ''
   ]);
   return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
     .setMimeType(ContentService.MimeType.JSON);
