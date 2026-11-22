@@ -5,7 +5,7 @@ import { SALON_CONFIG } from '../data/salonData';
 import { NavHoverLink } from './NavHoverLink';
 import aboutLoungeHeroImg from '../assets/images/about_lounge_hero_1795344838653.jpg';
 import aboutHydrangeaInsetImg from '../assets/images/about_hydrangea_inset_1795344837528.jpg';
-import aboutOwnerPortraitImg from '../assets/images/owner_portrait_light_body.jpg';
+import aboutOwnerPortraitImg from '../assets/images/owner_portrait_studio_blazer.jpg';
 import aboutConsultationBwImg from '../assets/images/about_consultation_bw_1795344839589.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -211,14 +211,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         className="bg-[#FBF9F5] text-[#18224B] pb-20 md:pb-28 px-4 sm:px-6 md:px-7"
       >
         <div className="mx-auto max-w-[1440px] grid grid-cols-1 lg:grid-cols-12 gap-y-8 lg:gap-x-0 items-start lg:items-stretch">
-          {/* Left Half: Tall Full-Height Editorial Portrait of the Founder & Owner */}
+          {/* Left Half: Editorial Portrait of the Founder & Owner (Maintains true 3:4 aspect ratio with zero stretching) */}
           <div className="lg:col-start-1 lg:col-span-6">
-            <div className="relative aspect-[2/3] lg:aspect-auto lg:h-[144vh] lg:min-h-[1080px] lg:max-h-[1420px] w-full overflow-hidden bg-[#EAE6DF]">
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#EAE6DF] shadow-[0_12px_44px_rgba(24,34,75,0.06)]">
               <img
                 src={aboutOwnerPortraitImg}
-                alt="Editorial portrait of the Founder and Owner of NOVA Unisex Salon seated beside the sunlit sanctuary lounge"
+                alt="Editorial portrait of Hershita, Founder and Owner of NOVA Unisex Salon, seated in an ivory tailored blazer beside the sunlit sanctuary lounge"
                 referrerPolicy="no-referrer"
-                className="h-full w-full object-cover object-[center_16%]"
+                className="h-full w-full object-cover object-center transition-transform duration-700 ease-out"
               />
             </div>
           </div>
