@@ -35,6 +35,7 @@ export interface ConciergeSettings {
   receptionPhone: string;
   notificationEmail: string;
   webhookUrl: string;
+  securityPin: string;
   callMeBotApiKey?: string;
   telegramBotToken?: string;
   telegramChatId?: string;
@@ -45,6 +46,7 @@ export const DEFAULT_CONCIERGE_SETTINGS: ConciergeSettings = {
   receptionPhone: '917275256535',
   notificationEmail: 'info@novasalon.in',
   webhookUrl: '',
+  securityPin: '1428',
   callMeBotApiKey: '',
   telegramBotToken: '',
   telegramChatId: '',
@@ -76,8 +78,25 @@ export function getConciergeSettings(): ConciergeSettings {
 }
 
 /**
- * Updates concierge notification settings.
+ * Verifies staff 4-digit PIN before granting access to confidential customer leads.
  */
+export function verifyConciergePin(pin: string): boolean {
+  const settings = getConciergeSettings();
+  const validPin = (settings.securityPin || '1428').trim();
+  return pin.trim() === validPin;
+}
+
+/**
+ * Updates staff security PIN.
+ */
+export function updateConciergePin(newPin: string): boolean {
+  const clean = newPin.trim();
+  if (clean.length >= 4) {
+    saveConciergeSettings({ securityPin: clean });
+    return true;
+  }
+  return false;
+}
 export function saveConciergeSettings(settings: Partial<ConciergeSettings>): ConciergeSettings {
   const current = getConciergeSettings();
   const next = { ...current, ...settings };

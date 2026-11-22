@@ -9,6 +9,8 @@ import {
   exportLeadsToCsv,
   getConciergeSettings,
   saveConciergeSettings,
+  verifyConciergePin,
+  updateConciergePin,
   ConciergeSettings,
 } from '../utils/leadCapture';
 
@@ -26,6 +28,11 @@ export const ConciergeLedgerModal: React.FC<ConciergeLedgerModalProps> = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<ConciergeSettings>(getConciergeSettings);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [newPinInput, setNewPinInput] = useState('');
+  const [pinUpdateMessage, setPinUpdateMessage] = useState<string | null>(null);
 
   // Sync leads when opened or on custom events
   useEffect(() => {
@@ -110,6 +117,112 @@ export const ConciergeLedgerModal: React.FC<ConciergeLedgerModalProps> = ({
     setSettingsOpen(false);
   };
 
+  const handleUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (verifyConciergePin(enteredPin)) {
+      setIsAuthenticated(true);
+      setPinError(null);
+    } else {
+      setPinError('Incorrect PIN. Access restricted to authorized sanctuary staff.');
+    }
+  };
+
+  const handleLockOut = () => {
+    setIsAuthenticated(false);
+    setEnteredPin('');
+    setPinError(null);
+    setSettingsOpen(false);
+  };
+
+  const handleChangePin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPinInput.trim().length >= 4) {
+      updateConciergePin(newPinInput.trim());
+      setSettings(getConciergeSettings());
+      setNewPinInput('');
+      setPinUpdateMessage('✓ Staff Security PIN successfully updated!');
+      window.setTimeout(() => setPinUpdateMessage(null), 3500);
+    } else {
+      setPinUpdateMessage('PIN must be at least 4 digits.');
+    }
+  };
+
+  // If locked, present the staff security gateway
+  if (!isAuthenticated) {
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="concierge-lock-title"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs text-[#18224B]"
+      >
+        <div className="relative w-full max-w-md bg-[#FBF9F5] border-2 border-[#18224B] shadow-2xl overflow-hidden">
+          <div className="bg-[#18224B] text-[#FBF9F5] px-6 py-4 flex items-center justify-between border-b border-[#FBF9F5]/15">
+            <span className="font-mono-tabular text-[10px] uppercase tracking-[0.2em] text-[#E8D5B5]">
+              NOVA SANCTUARY · STAFF SECURITY
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs uppercase text-[#FBF9F5]/60 hover:text-[#FBF9F5] cursor-pointer"
+            >
+              ✕ Close
+            </button>
+          </div>
+
+          <div className="p-8 text-center space-y-6">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#18224B]/5 border border-[#18224B]/15 text-2xl text-[#18224B]">
+              🔒
+            </div>
+
+            <div className="space-y-1.5">
+              <h2 id="concierge-lock-title" className="font-serif-editorial text-2xl sm:text-3xl text-[#18224B]">
+                Staff Concierge Access
+              </h2>
+              <p className="font-basel text-xs text-[#18224B]/65 leading-relaxed">
+                Client phone numbers and booking requests are confidential. Enter your sanctuary staff PIN to view records.
+              </p>
+            </div>
+
+            <form onSubmit={handleUnlock} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={8}
+                  autoFocus
+                  placeholder="• • • •"
+                  value={enteredPin}
+                  onChange={(e) => {
+                    setEnteredPin(e.target.value);
+                    setPinError(null);
+                  }}
+                  className="w-44 mx-auto text-center font-mono text-2xl tracking-[0.3em] py-3 bg-white border-2 border-[#18224B]/30 focus:border-[#18224B] focus:outline-none"
+                />
+                {pinError && (
+                  <p role="alert" className="mt-2 text-xs text-[#9E2A2B] font-basel font-medium">
+                    {pinError}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full font-basel py-3.5 px-6 text-xs uppercase tracking-[0.14em] bg-[#18224B] text-white hover:bg-[#2A3772] transition-colors cursor-pointer font-medium"
+              >
+                Unlock Customer Ledger →
+              </button>
+            </form>
+
+            <span className="text-[10px] text-[#18224B]/40 block font-mono">
+              Protected by 4-digit PIN · Kingship by Kahlon
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       role="dialog"
@@ -135,13 +248,21 @@ export const ConciergeLedgerModal: React.FC<ConciergeLedgerModalProps> = ({
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleLockOut}
+              className="font-basel text-[11px] uppercase tracking-[0.08em] px-3 py-1.5 border border-[#FBF9F5]/30 hover:border-[#FBF9F5] text-[#FBF9F5] transition-colors cursor-pointer"
+              title="Lock Concierge Desk immediately"
+            >
+              🔒 Lock Desk
+            </button>
             <button
               type="button"
               onClick={() => setSettingsOpen(!settingsOpen)}
               className="font-basel text-[11px] uppercase tracking-[0.08em] px-3 py-1.5 border border-[#FBF9F5]/30 hover:border-[#FBF9F5] text-[#FBF9F5] transition-colors cursor-pointer"
             >
-              {settingsOpen ? 'Close Settings' : '⚙ Alerts Setup'}
+              {settingsOpen ? 'Close Settings' : '⚙ Alerts & PIN'}
             </button>
             <button
               type="button"
@@ -239,6 +360,38 @@ export const ConciergeLedgerModal: React.FC<ConciergeLedgerModalProps> = ({
                 />
                 <span className="text-[10px] text-[#18224B]/50 mt-0.5 block">
                   Admin destination phone number with country code (e.g. 917275256535).
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-[10.5px] uppercase tracking-[0.1em] text-[#18224B]/70 mb-1">
+                  Change Staff Security PIN (Default: 1428)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={8}
+                    value={newPinInput}
+                    onChange={(e) => setNewPinInput(e.target.value)}
+                    placeholder="New 4-digit PIN"
+                    className="flex-1 bg-white border border-[#18224B]/20 px-3 py-2 text-xs focus:outline-none focus:border-[#18224B]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleChangePin}
+                    className="px-3 py-2 bg-[#18224B] text-white text-xs hover:bg-[#2A3772] cursor-pointer whitespace-nowrap"
+                  >
+                    Update PIN
+                  </button>
+                </div>
+                {pinUpdateMessage && (
+                  <span className="text-[10.5px] text-[#065F46] font-medium mt-1 block">
+                    {pinUpdateMessage}
+                  </span>
+                )}
+                <span className="text-[10px] text-[#18224B]/50 mt-0.5 block">
+                  Locks the concierge ledger so only you and authorized staff can view client records.
                 </span>
               </div>
             </div>

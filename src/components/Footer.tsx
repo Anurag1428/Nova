@@ -187,11 +187,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking, onNavigatePage, o
               <button
                 type="button"
                 onClick={onOpenConciergeLedger}
-                className="cursor-pointer text-[#9E7F4F] hover:text-[#18224B] transition-colors inline-flex items-center gap-1.5 font-medium"
-                title="Open Reception Concierge Desk & Abandoned Leads Ledger (Shortcut: Ctrl+Shift+L)"
+                className="cursor-pointer text-[#18224B]/40 hover:text-[#18224B] transition-colors inline-flex items-center gap-1 text-[11px]"
+                title="Staff Portal (PIN Protected · Shortcut: Ctrl+Shift+L)"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                <span>Concierge Desk</span>
+                <span>🔒 Staff Portal</span>
               </button>
             )}
             <button

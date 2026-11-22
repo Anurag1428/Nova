@@ -10,6 +10,8 @@ import {
   exportLeadsToCsv,
   saveConciergeSettings,
   getConciergeSettings,
+  verifyConciergePin,
+  updateConciergePin,
 } from './leadCapture';
 
 test('saveCapturedLead and getCapturedLeads persist and order leads newest first', () => {
@@ -172,4 +174,17 @@ test('getConciergeSettings and saveConciergeSettings store contact preferences',
 
   const retrieved = getConciergeSettings();
   assert.equal(retrieved.notificationEmail, 'owner@novasalon.in');
+});
+
+test('verifyConciergePin validates 4-digit security PIN and rejects unauthorized attempts', () => {
+  assert.equal(verifyConciergePin('1428'), true);
+  assert.equal(verifyConciergePin('0000'), false);
+  assert.equal(verifyConciergePin(''), false);
+
+  updateConciergePin('9988');
+  assert.equal(verifyConciergePin('9988'), true);
+  assert.equal(verifyConciergePin('1428'), false);
+
+  // Restore default for other tests
+  updateConciergePin('1428');
 });
