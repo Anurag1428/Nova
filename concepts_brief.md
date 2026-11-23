@@ -13,13 +13,15 @@ A technical and operational audit and polish pass for the NOVA Sanctuary website
 * **Initial Defect:** `socials` linked to a dead anchor `#instagram`. In `Footer.tsx`, tapping it inadvertently triggered `onOpenBooking` rather than external navigation.
 * **Resolution:** Connected genuine Instagram handle (`https://www.instagram.com/nova.unisexsalon8866?jplx=MXBtdTUweHdtMjJrdw==`) and updated `Footer.tsx` to cleanly render outbound links with `target="_blank"` and `rel="noopener noreferrer"`.
 
-### 2. Gift Cards Concierge Integration
-* **Explanation:** In quiet-luxury salons, gift cards allow patrons to gift bespoke treatments (facials, bridal beauty, skin consultations) to family and friends. Because the salon does not yet have an automated e-commerce payment gateway (e.g. Razorpay merchant account), a dead `#gift-cards` button left a broken user experience.
-* **Resolution:** Routed "Gift Cards" directly to the salon's reception WhatsApp concierge with a pre-filled message: `"Hello NOVA Sanctuary, I would like to inquire about purchasing a Sanctuary Gift Card or Experience Voucher."` This turns a dead link into an instant inquiry channel.
+### 2. Resolution of the "Gift Card" Problem
+* **Root Cause:** "Gift Cards" was an unconfigured placeholder button from the design template. In `MenuDrawer.tsx`, clicking it accidentally triggered the consultation booking drawer with zero explanation, and Indian salon patrons in Lucknow communicate via WhatsApp rather than purchasing gift cards online.
+* **Resolution:** Replaced "Gift Cards" with direct reception "WhatsApp" across both the slide-over navigation menu (`MenuDrawer.tsx`) and the footer (`Footer.tsx`). Both now display `Instagram / WhatsApp` pointing directly to the salon's verified Instagram handle and the official reception WhatsApp.
 
-### 3. Favicon & Link Sharing Metadata
-* **Explanation:** A favicon is the monogram icon displayed on browser tabs, bookmarks, and mobile home screen shortcuts. Without it, browsers show a generic globe or blank sheet and trigger 404 network errors for `/favicon.ico`. When links are shared via WhatsApp or Instagram DMs, lack of `og:image` leaves a bare blue URL without an image preview.
-* **Resolution:** Designed a geometric SVG favicon (`/public/favicon.svg`) featuring NOVA's gold monogram and midnight navy backing. Added `<link rel="icon">`, `<link rel="apple-touch-icon">`, and OpenGraph preview tags (`og:image`, `twitter:image`) in `index.html`.
+### 3. Official Brand Favicon & Link Sharing Metadata
+* **Resolution:** Generated multi-resolution favicons (`favicon.png`, `apple-touch-icon.png`, and `favicon.ico`) directly from the salon owner's official gold & black circular crown emblem (`NOVA UNISEX SALON & MAKEUP STUDIO`). Linked them in `index.html` alongside OpenGraph social preview tags.
+
+### 4. Indian Rupee (₹) Pricing Localization
+* **Resolution:** Replaced all leftover `$ (Example)` pricing in `src/data/salonData.ts` with authentic Indian Rupee (`₹`) pricing (e.g. ₹2,500 for The NOVA Signature Facial, ₹8,500 for Bridal Beauty, and ₹999 for Skincare Consultations).
 
 ### 4. iOS Safari Viewport Auto-Zoom
 * **Explanation:** On iPhones, Mobile Safari automatically forces an intrusive viewport zoom on any input whose font size is under 16px. Form inputs in `BookingDrawer.tsx` and `VipPrivilegeModal.tsx` were styled with `text-xs` (12px) and `text-sm` (14px).

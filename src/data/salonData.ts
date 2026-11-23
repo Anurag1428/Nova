@@ -251,7 +251,7 @@ export const SALON_CONFIG = {
           id: 'nova-signature-facial',
           name: 'The NOVA Signature Facial',
           duration: '75 min',
-          examplePrice: '$190 (Example)',
+          examplePrice: '₹2,500',
           summary:
             'A customized ritual combining double botanical cleansing, gentle enzymatic polish, extended sculptural facial massage, and a bespoke hydro-soothing mask.',
           includes: ['Skin consultation', 'Sculptural buccal & lymphatic massage', 'Custom botanical mask', 'Scalp & neck release'],
@@ -260,7 +260,7 @@ export const SALON_CONFIG = {
           id: 'barrier-calm-infusion',
           name: 'Barrier Calm & Moisture Infusion',
           duration: '60 min',
-          examplePrice: '$165 (Example)',
+          examplePrice: '₹1,800',
           summary:
             'Designed for sensitive, fatigued, or seasonally dry complexions seeking immediate comfort, lipid replenishment, and a soft, rested glow.',
           includes: ['Chamomile & oat compress', 'Cooling stone drainage', 'Ceramide & squalane layering'],
@@ -269,7 +269,7 @@ export const SALON_CONFIG = {
           id: 'sculpt-and-illuminate',
           name: 'Sculpt & Illuminate Ritual',
           duration: '90 min',
-          examplePrice: '$240 (Example)',
+          examplePrice: '₹3,200',
           summary:
             'An extended facial focused on releasing jaw and facial tension through slow, rhythmic manual contouring and warm botanical oil compresses.',
           includes: ['Extended 40-min facial massage', 'Warm herbal poultice', 'Décolletage nourishment'],
@@ -294,7 +294,7 @@ export const SALON_CONFIG = {
           id: 'bare-luxury-manicure',
           name: 'The Bare Luxury Manicure',
           duration: '50 min',
-          examplePrice: '$85 (Example)',
+          examplePrice: '₹1,200',
           summary:
             'Detailed shaping, gentle cuticle refinement, warm mineral hand soak, exfoliating sugar polish, massage, and your choice of buff-to-shine or sheer tint.',
           includes: ['Precision cuticle care', 'Botanical scrub & warm towel wrap', 'Sheer gloss or natural polish'],
@@ -303,7 +303,7 @@ export const SALON_CONFIG = {
           id: 'minimalist-nail-art-gel',
           name: 'Structured Gel & Minimalist Nail Art',
           duration: '75 min',
-          examplePrice: '$125 (Example)',
+          examplePrice: '₹1,800',
           summary:
             'A protective structured base finished with fine micro-French lines, Negative-space accents, or custom translucent tones mixed to flatter your skin undertone.',
           includes: ['Gentle soak-off if required', 'Custom tone blending', 'Bespoke minimalist art detail'],
@@ -312,7 +312,7 @@ export const SALON_CONFIG = {
           id: 'restorative-stone-pedicure',
           name: 'Restorative Warm Stone Pedicure',
           duration: '65 min',
-          examplePrice: '$115 (Example)',
+          examplePrice: '₹1,500',
           summary:
             'Unhurried foot care featuring a warm aromatic soak, gentle callus smoothing, lower-leg tension massage with warm basalt stones, and pristine polish.',
           includes: ['Aromatic mineral foot bath', 'Warm stone calf massage', 'Cuticle oil & polish finish'],
@@ -337,7 +337,7 @@ export const SALON_CONFIG = {
           id: 'bridal-bespoke-preview',
           name: 'Bridal Beauty Consultation & Preview',
           duration: '90 min',
-          examplePrice: '$220 (Example)',
+          examplePrice: '₹8,500',
           summary:
             'A collaborative session exploring your dress, lighting, and personal style to design a timeless bridal complexion and eye look tailored exclusively for you.',
           includes: ['Mini hydrating skin prep', 'Custom shade charting', 'Wear-test notes & touch-up kit guide'],
@@ -346,7 +346,7 @@ export const SALON_CONFIG = {
           id: 'wedding-day-application',
           name: 'Wedding Day Bespoke Artistry',
           duration: '75 min',
-          examplePrice: '$280 (Example)',
+          examplePrice: '₹15,000',
           summary:
             'Calm, unhurried wedding morning skin preparation and makeup application in our private suite or at your chosen venue by arrangement.',
           includes: ['Cooling eye & lip prep', 'Long-wear skin-first finish', 'Complimentary lip touch-up vial'],
@@ -355,7 +355,7 @@ export const SALON_CONFIG = {
           id: 'evening-editorial-makeup',
           name: 'Occasion & Editorial Makeup',
           duration: '60 min',
-          examplePrice: '$160 (Example)',
+          examplePrice: '₹5,500',
           summary:
             'Refined, camera-ready makeup for events, portraits, or gala evenings—balancing softly sculpted structure with effortless freshness.',
           includes: ['Express lymphatic skin prep', 'Individual lash placement (optional)', 'Custom complexion finish'],
@@ -380,7 +380,7 @@ export const SALON_CONFIG = {
           id: 'holistic-skin-consultation',
           name: 'One-on-One Skincare Edit & Consultation',
           duration: '45 min',
-          examplePrice: '$95 (Example)',
+          examplePrice: '₹999',
           summary:
             'Bring your current skincare bag for an honest, ingredient-by-ingredient review. Leave with a simplified morning and evening ritual plan tailored to your skin.',
           includes: ['Current product audit', 'Written seasonal routine card', 'Redeemable toward any facial ritual on the day'],
@@ -389,7 +389,7 @@ export const SALON_CONFIG = {
           id: 'consultation-plus-custom-facial',
           name: 'First Visit: Consultation + Bespoke Facial',
           duration: '90 min',
-          examplePrice: '$210 (Example)',
+          examplePrice: '₹2,999',
           summary:
             'Our recommended introduction to NOVA—combining a 25-minute in-depth consultation with a 65-minute tailored facial treatment.',
           includes: ['Comprehensive skin & lifestyle intake', '65-min customized facial', 'Follow-up home ritual notes'],
@@ -398,7 +398,7 @@ export const SALON_CONFIG = {
           id: 'bridal-skin-journey-plan',
           name: 'Pre-Event & Bridal Skin Preparation Plan',
           duration: '60 min',
-          examplePrice: '$140 (Example)',
+          examplePrice: '₹1,999',
           summary:
             'A structured 3-to-6-month calendar of gentle facials, nail care, and home rituals leading up to a wedding or milestone occasion.',
           includes: ['Timeline scheduling', 'Express hydrating treatment', 'Home care simplicity guide'],
@@ -486,7 +486,7 @@ export const SALON_CONFIG = {
     ],
     socials: [
       { label: 'Instagram', url: 'https://www.instagram.com/nova.unisexsalon8866?jplx=MXBtdTUweHdtMjJrdw==' },
-      { label: 'Gift Cards', url: 'https://wa.me/917275256535?text=Hello%20NOVA%20Sanctuary%2C%20I%20would%20like%20to%20inquire%20about%20purchasing%20a%20Sanctuary%20Gift%20Card%20or%20Experience%20Voucher.' },
+      { label: 'WhatsApp', url: 'https://wa.me/917275256535?text=Hello%20NOVA%20Sanctuary%2C%20I%20would%20like%20to%20connect%20with%20your%20reception.' },
     ],
   },
 

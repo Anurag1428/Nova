@@ -277,29 +277,36 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                 </abbr>
               </dt>
               <dd className="flex items-center gap-1.5 text-[#FBF9F5]/95">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenBooking();
-                  }}
-                  className="cursor-pointer hover:opacity-70 transition-opacity"
-                >
-                  Instagram
-                </button>
-                <span aria-hidden="true" className="text-[#FBF9F5]/45">
-                  /
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenBooking();
-                  }}
-                  className="cursor-pointer hover:opacity-70 transition-opacity"
-                >
-                  Gift Cards
-                </button>
+                {contact.socials.map((soc, idx) => (
+                  <React.Fragment key={soc.label}>
+                    {idx > 0 && (
+                      <span aria-hidden="true" className="text-[#FBF9F5]/45">
+                        /
+                      </span>
+                    )}
+                    {soc.url && soc.url.startsWith('http') ? (
+                      <a
+                        href={soc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cursor-pointer hover:opacity-70 transition-opacity"
+                      >
+                        {soc.label}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onOpenBooking();
+                        }}
+                        className="cursor-pointer hover:opacity-70 transition-opacity"
+                      >
+                        {soc.label}
+                      </button>
+                    )}
+                  </React.Fragment>
+                ))}
               </dd>
             </div>
           </dl>
