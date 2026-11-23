@@ -47,7 +47,7 @@ export interface ConciergeSettings {
 
 export const DEFAULT_CONCIERGE_SETTINGS: ConciergeSettings = {
   receptionPhone: '917275256535',
-  notificationEmail: 'info@novasalon.in',
+  notificationEmail: 'info@novasalonlucknow.in',
   webhookUrl: '',
   googleSheetsWebhookUrl: '',
   airtableWebhookUrl: '',
@@ -328,7 +328,7 @@ export function formatOwnerAlertText(lead: CapturedLeadRecord): string {
     lead.notes ? `Notes: ${lead.notes}` : '',
     ``,
     `Action needed: Call or WhatsApp this guest immediately at ${lead.clientPhone}`,
-    `Captured via: novasalon.in at ${new Date(lead.capturedAtIso).toLocaleTimeString()}`,
+    `Captured via: novasalonlucknow.in at ${new Date(lead.capturedAtIso).toLocaleTimeString()}`,
   ]
     .filter(Boolean)
     .join('\n');

@@ -472,9 +472,9 @@ export const SALON_CONFIG = {
     addressLine1: 'Shop no UGF 04, 12A, Nova Unisex Salon, Kingship by Kahlon',
     addressLine2: 'Sector 16, Vrindavan Colony, Lucknow, Uttar Pradesh 226029',
     directionsUrl: 'https://www.google.com/maps/place/Nova+Unisex+Salon+%26+Makeup+Studio/@26.7504532,80.9539723,19z/data=!4m6!3m5!1s0x399bfb002f5ba615:0xf862f22ac3bd16b4!8m2!3d26.7504532!4d80.9539723!16s%2Fg%2F11z_gsgz1h',
-    email: 'info@novasalon.in',
-    phoneDisplay: '(+91) 9196355139',
-    phoneHref: 'tel:+919196355139',
+    email: 'info@novasalonlucknow.in',
+    phoneDisplay: '(+91) 72752 56535',
+    phoneHref: 'tel:+917275256535',
     hours: [
       { days: 'Mo', time: '10:00AM - 9:00PM' },
       { days: 'Tu', time: '10:00AM - 9:00PM' },

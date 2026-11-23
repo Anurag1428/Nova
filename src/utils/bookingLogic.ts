@@ -317,7 +317,7 @@ export function generateWhatsAppMessageText(booking: ConfirmedDemoBooking): stri
 
   lines.push(``);
   lines.push(`Sanctuary: Kingship by Kahlon, Sector 16, Vrindavan Colony, Lucknow`);
-  lines.push(`Requested via novasalon.in`);
+  lines.push(`Requested via novasalonlucknow.in`);
 
   return lines.join('\n');
 }
@@ -399,7 +399,7 @@ export function generateWhatsAppBookingUrl(
  */
 export function generateEmailBookingUrl(
   booking: ConfirmedDemoBooking,
-  targetEmail = 'info@novasalon.in'
+  targetEmail = 'info@novasalonlucknow.in'
 ): string {
   const subject = `[NOVA Sanctuary Booking] ${booking.referenceCode} — ${booking.clientName}`;
   const body = generateWhatsAppMessageText(booking);

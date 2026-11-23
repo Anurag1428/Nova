@@ -187,7 +187,7 @@ test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon
   assert.ok(waUrl.includes('NOVA%20Signature%20Facial'));
 
   const emailUrl = generateEmailBookingUrl(booking);
-  assert.ok(emailUrl.startsWith('mailto:info@novasalon.in?subject='));
+  assert.ok(emailUrl.startsWith('mailto:info@novasalonlucknow.in?subject='));
   assert.ok(emailUrl.includes('Priya%20Sharma'));
 
   const messageText = generateWhatsAppMessageText(booking);
