@@ -7,6 +7,7 @@ import {
   updateLeadStatus,
   dispatchLeadNotification,
 } from '../utils/leadCapture';
+import { useLiveSalonSettings } from '../utils/liveSalonSettings';
 import {
   AVAILABLE_TIME_SLOTS,
   BookingFormInput,
@@ -89,6 +90,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
   onClose,
   onBookingConfirmed,
 }) => {
+  const liveSettings = useLiveSalonSettings();
   const defaultCategory = initialCategoryId || SALON_CONFIG.treatmentCategories[0].id;
   const defaultRituals = getCategoryServices(defaultCategory);
   const defaultRitual = initialRitualId || defaultRituals[0]?.id || '';
@@ -261,7 +263,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
     onBookingConfirmed(record);
   };
 
-  const hasVipApplied = form.notes && /VIP500|VIP\s+Welcome/i.test(form.notes);
+  const hasVipApplied = Boolean(form.notes && /VIP|Welcome Privilege/i.test(form.notes));
 
   return (
     <div
@@ -355,7 +357,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
             {hasVipApplied && !latestConfirmed && (
               <div className="mb-5 flex items-center gap-2 p-3 bg-[#C5B393]/15 border border-[#C5B393] text-xs font-basel text-[#18224B]">
                 <span className="text-[#9E7F4F] font-bold">✦ VIP PRIVILEGE:</span>
-                <span>Your ₹500 welcome credit voucher will be automatically applied at reception!</span>
+                <span>Your ₹{liveSettings.voucherAmount} welcome credit voucher will be automatically applied at reception!</span>
               </div>
             )}
 

@@ -19,6 +19,7 @@ import { InteractiveNovaWordmark } from './components/InteractiveNovaWordmark';
 import { PageTransitionCurtain } from './components/PageTransitionCurtain';
 import { NavHoverLink } from './components/NavHoverLink';
 import { ConfirmedDemoBooking } from './utils/bookingLogic';
+import { useLiveSalonSettings } from './utils/liveSalonSettings';
 import {
   getPageTransitionTimings,
   shouldAnimatePageTransition,
@@ -28,6 +29,7 @@ import {
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+  const liveSettings = useLiveSalonSettings();
   const [openingStage, setOpeningStage] = useState<'curtain' | 'revealing' | 'complete'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -58,8 +60,9 @@ export default function App() {
   const transitionTlRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
-    // Proactively invite first-time visitors with the ₹500 VIP Welcome Privilege after 12 seconds
+    // Proactively invite first-time visitors with the VIP Welcome Privilege after 12 seconds
     if (typeof window === 'undefined') return;
+    if (!liveSettings.isPopupActive) return;
     const dismissed = window.localStorage.getItem('nova_vip_privilege_dismissed_v1');
     if (!dismissed) {
       const timer = window.setTimeout(() => {
@@ -67,7 +70,7 @@ export default function App() {
       }, 12000);
       return () => window.clearTimeout(timer);
     }
-  }, []);
+  }, [liveSettings.isPopupActive]);
 
   useEffect(() => {
     if (openingStage === 'complete') return;
@@ -254,7 +257,7 @@ export default function App() {
     setBookingPreset({
       clientName,
       clientPhone,
-      notes: `Applied ₹500 VIP Welcome Privilege Voucher (${voucherCode})`,
+      notes: `Applied ₹${liveSettings.voucherAmount} VIP Welcome Privilege Voucher (${voucherCode})`,
     });
     setBookingOpen(true);
   };
@@ -683,20 +686,22 @@ export default function App() {
       />
 
       {/* FLOATING VIP PRIVILEGE VOUCHER PILL */}
-      <aside aria-label="Sanctuary Welcome Privilege" className="fixed bottom-6 left-6 z-40 hidden sm:block">
-        <button
-          type="button"
-          onClick={() => setVipModalOpen(true)}
-          className="group cursor-pointer flex items-center gap-2.5 px-4 py-2.5 bg-[#18224B] text-[#FBF9F5] border border-[#C5B393] shadow-[0_4px_20px_rgba(24,34,75,0.25)] hover:bg-[#2A3772] transition-all duration-300"
-          title="Claim ₹500 Sanctuary Welcome Privilege Voucher"
-        >
-          <span className="text-[#E8D5B5] text-xs animate-pulse">✦</span>
-          <span className="font-basel text-[11px] uppercase tracking-[0.14em] font-medium">
-            ₹500 Welcome Privilege
-          </span>
-          <span className="text-xs text-[#E8D5B5] group-hover:translate-x-0.5 transition-transform">→</span>
-        </button>
-      </aside>
+      {liveSettings.isPopupActive && (
+        <aside aria-label="Sanctuary Welcome Privilege" className="fixed bottom-6 left-6 z-40 hidden sm:block">
+          <button
+            type="button"
+            onClick={() => setVipModalOpen(true)}
+            className="group cursor-pointer flex items-center gap-2.5 px-4 py-2.5 bg-[#18224B] text-[#FBF9F5] border border-[#C5B393] shadow-[0_4px_20px_rgba(24,34,75,0.25)] hover:bg-[#2A3772] transition-all duration-300"
+            title={`Claim ₹${liveSettings.voucherAmount} Sanctuary Welcome Privilege Voucher`}
+          >
+            <span className="text-[#E8D5B5] text-xs animate-pulse">✦</span>
+            <span className="font-basel text-[11px] uppercase tracking-[0.14em] font-medium">
+              ₹{liveSettings.voucherAmount} Welcome Privilege
+            </span>
+            <span className="text-xs text-[#E8D5B5] group-hover:translate-x-0.5 transition-transform">→</span>
+          </button>
+        </aside>
+      )}
 
       {/* RISING ALABASTER CURTAIN PAGE TRANSITION LAYER */}
       <PageTransitionCurtain

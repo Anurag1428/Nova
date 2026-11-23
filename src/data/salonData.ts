@@ -512,6 +512,10 @@ export const SALON_CONFIG = {
         (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_VIP_TABLE_ID) ||
         (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_VIP_TABLE_ID : '') ||
         'tblGXJsK7tQWqf0kP',
+      settingsTableId:
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_AIRTABLE_SETTINGS_TABLE_ID) ||
+        (typeof process !== 'undefined' && process.env ? process.env.VITE_AIRTABLE_SETTINGS_TABLE_ID : '') ||
+        'tblFhgDOcFoqyKjAT',
     },
     // Optional Airtable Webhook URL
     airtableWebhookUrl:

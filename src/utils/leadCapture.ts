@@ -312,7 +312,7 @@ export function captureBookingLead(
 export function formatOwnerAlertText(lead: CapturedLeadRecord): string {
   let statusHeadline = '✅ [NEW BOOKING] Customer requested appointment transmission';
   if (lead.status === 'vip_privilege_claimed') {
-    statusHeadline = '🎁 [VIP PRIVILEGE CLAIMED] Guest unlocked ₹500 Welcome Voucher! Call/WhatsApp to schedule ritual.';
+    statusHeadline = `🎁 [VIP PRIVILEGE CLAIMED] Guest unlocked ${lead.examplePrice || 'VIP Welcome Privilege'}! Call/WhatsApp to schedule ritual.`;
   } else if (lead.status === 'confirmed_on_site' || lead.status === 'draft_entered') {
     statusHeadline = '⚠️ [HOT LEAD] Customer filled booking form but did NOT send WhatsApp yet!';
   }
@@ -412,7 +412,7 @@ export async function dispatchLeadNotification(
         preferredTime: lead.preferredTime,
         status:
           lead.status === 'vip_privilege_claimed'
-            ? '₹500 VIP Voucher Claimed'
+            ? `${lead.examplePrice || 'VIP Voucher'} Claimed`
             : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
               ? 'Form Filled (Did Not Send)'
               : lead.status === 'dispatched_whatsapp'
@@ -608,17 +608,20 @@ export async function sendLeadToAirtable(
         return phoneStr;
       };
 
+      const parsedVoucher = parseInt((lead.examplePrice || lead.notes || '').replace(/[^\d]/g, ''), 10);
+      const voucherValue = !isNaN(parsedVoucher) && parsedVoucher > 0 ? parsedVoucher : 500;
+
       const fields: Record<string, any> = isVip
         ? {
-            'Voucher Code': lead.referenceCode || 'NOVA-VIP500',
+            'Voucher Code': lead.referenceCode || `NOVA-VIP${voucherValue}`,
             'Client Name': lead.clientName,
             Phone: formatIndianPhone(lead.clientPhone),
             ...(isValidEmail(lead.clientEmail) ? { Email: lead.clientEmail.trim() } : {}),
             Ritual: lead.ritualName || 'Signature Facial',
-            'Voucher Value': 500,
+            'Voucher Value': voucherValue,
             Status: 'Active',
             'Issue Date': new Date().toISOString().split('T')[0],
-            Notes: lead.notes || 'Claimed ₹500 VIP Welcome Privilege on NOVA Sanctuary website',
+            Notes: lead.notes || `Claimed ₹${voucherValue} VIP Welcome Privilege on NOVA Sanctuary website`,
           }
         : {
             'Client Name': lead.clientName,
@@ -669,7 +672,7 @@ export async function sendLeadToAirtable(
         preferredTime: lead.preferredTime,
         status:
           lead.status === 'vip_privilege_claimed'
-            ? 'VIP ₹500 Claimed'
+            ? `VIP ${lead.examplePrice || 'Voucher'} Claimed`
             : lead.status === 'confirmed_on_site' || lead.status === 'draft_entered'
               ? 'Form Filled (Needs Follow-up)'
               : lead.status === 'dispatched_whatsapp'

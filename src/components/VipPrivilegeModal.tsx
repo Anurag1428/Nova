@@ -3,6 +3,7 @@ import {
   saveCapturedLead,
   dispatchLeadNotification,
 } from '../utils/leadCapture';
+import { useLiveSalonSettings } from '../utils/liveSalonSettings';
 
 interface VipPrivilegeModalProps {
   isOpen: boolean;
@@ -12,13 +13,16 @@ interface VipPrivilegeModalProps {
 
 const VIP_STORAGE_DISMISSED = 'nova_vip_privilege_dismissed_v1';
 const VIP_STORAGE_CLAIMED = 'nova_vip_privilege_claimed_v1';
-const VOUCHER_CODE = 'NOVA-VIP500';
 
 export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
   isOpen,
   onClose,
   onApplyToBooking,
 }) => {
+  const liveSettings = useLiveSalonSettings();
+  const voucherAmount = liveSettings.voucherAmount;
+  const voucherCode = liveSettings.voucherCode;
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,20 +47,22 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
       const timer = window.setTimeout(async () => {
         autoCapturedPhoneRef.current = cleanPhone;
         const clientName = name.trim() || 'Sanctuary Guest';
-        const formattedPhone = cleanPhone.length === 10 ? `+91 ${cleanPhone}` : `+${cleanPhone}`;
+        const formattedPhone = cleanPhone.length === 10
+          ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+          : `+${cleanPhone}`;
 
         const lead = saveCapturedLead({
-          referenceCode: VOUCHER_CODE,
+          referenceCode: voucherCode,
           clientName,
           clientPhone: formattedPhone,
           clientEmail: '',
           ritualName: 'Signature Facial',
           categoryId: 'vip',
           duration: 'Flexible',
-          examplePrice: '₹500 Credit',
+          examplePrice: `₹${voucherAmount} Credit`,
           preferredDate: new Date().toISOString().split('T')[0],
           preferredTime: 'Flexible',
-          notes: `VIP Privilege form filled (auto-captured before clicking unlock) · Voucher ${VOUCHER_CODE}`,
+          notes: `VIP Privilege form filled (auto-captured before clicking unlock) · Voucher ${voucherCode}`,
           status: 'vip_privilege_claimed',
           sentNotification: false,
         });
@@ -70,9 +76,9 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
 
       return () => window.clearTimeout(timer);
     }
-  }, [name, phone, isClaimed]);
+  }, [name, phone, isClaimed, voucherAmount, voucherCode]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !liveSettings.isPopupActive) return null;
 
   const handleDismiss = () => {
     if (typeof window !== 'undefined') {
@@ -93,21 +99,23 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
     setIsSubmitting(true);
 
     const clientName = name.trim() || 'Sanctuary Guest';
-    const formattedPhone = cleanPhone.length === 10 ? `+91 ${cleanPhone}` : `+${cleanPhone}`;
+    const formattedPhone = cleanPhone.length === 10
+      ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+      : `+${cleanPhone}`;
 
     // 1. Instantly capture lead in reception ledger
     const lead = saveCapturedLead({
-      referenceCode: VOUCHER_CODE,
+      referenceCode: voucherCode,
       clientName,
       clientPhone: formattedPhone,
       clientEmail: '',
       ritualName: 'Signature Facial',
       categoryId: 'vip',
       duration: 'Flexible',
-      examplePrice: '₹500 Credit',
+      examplePrice: `₹${voucherAmount} Credit`,
       preferredDate: new Date().toISOString().split('T')[0],
       preferredTime: 'Flexible',
-      notes: `Claimed ₹500 VIP Welcome Privilege Voucher (${VOUCHER_CODE})`,
+      notes: `Claimed ₹${voucherAmount} VIP Welcome Privilege Voucher (${voucherCode})`,
       status: 'vip_privilege_claimed',
       sentNotification: false,
     });
@@ -129,13 +137,13 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
   };
 
   const handleBookWithCredit = () => {
-    onApplyToBooking(name.trim(), phone.trim(), VOUCHER_CODE);
+    onApplyToBooking(name.trim(), phone.trim(), voucherCode);
     onClose();
   };
 
   const cleanAdminPhone = '917275256535';
   const whatsAppVoucherText = encodeURIComponent(
-    `Hello NOVA Sanctuary, I would like to claim my ₹500 Welcome Privilege voucher (${VOUCHER_CODE}) for my first ritual. Name: ${name.trim() || 'Guest'} · Phone: ${phone.trim()}`
+    `Hello NOVA Sanctuary, I would like to claim my ₹${voucherAmount} Welcome Privilege voucher (${voucherCode}) for my first ritual. Name: ${name.trim() || 'Guest'} · Phone: ${phone.trim()}`
   );
   const whatsAppVoucherUrl = `https://wa.me/${cleanAdminPhone}?text=${whatsAppVoucherText}`;
 
@@ -169,10 +177,10 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                 id="vip-privilege-title"
                 className="font-serif-editorial text-3xl sm:text-4xl font-light leading-[1.1] tracking-[-0.025em] text-[#18224B]"
               >
-                The ₹500 Welcome Privilege
+                The ₹{voucherAmount} Welcome Privilege
               </h2>
               <p className="font-basel text-[13px] leading-[1.6] text-[#18224B]/75 pt-1">
-                Receive a private <strong className="font-semibold text-[#18224B]">₹500 welcome credit</strong> towards your first signature ritual (Facials, Nail Artistry, Makeup, or Hair) at Kingship by Kahlon, Lucknow.
+                Receive a private <strong className="font-semibold text-[#18224B]">₹{voucherAmount} welcome credit</strong> towards your first signature ritual (Facials, Nail Artistry, Makeup, or Hair) at Kingship by Kahlon, Lucknow.
               </p>
             </div>
 
@@ -241,7 +249,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                 disabled={isSubmitting}
                 className="w-full font-basel cursor-pointer py-4 px-6 text-[12px] uppercase tracking-[0.14em] bg-[#18224B] text-[#FBF9F5] hover:bg-[#2A3772] transition-colors font-medium shadow-sm hover:shadow-md disabled:opacity-50"
               >
-                {isSubmitting ? 'Activating Privilege...' : 'Unlock ₹500 Sanctuary Credit →'}
+                {isSubmitting ? 'Activating Privilege...' : `Unlock ₹${voucherAmount} Sanctuary Credit →`}
               </button>
             </form>
 
@@ -262,7 +270,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                 Privilege Credit Activated
               </span>
               <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#18224B]">
-                Your ₹500 Voucher is Ready
+                Your ₹{voucherAmount} Voucher is Ready
               </h2>
               <p className="font-basel text-xs text-[#18224B]/70 max-w-sm mx-auto">
                 We have reserved your introductory credit. Present this code or tap below to apply it to your appointment.
@@ -275,10 +283,10 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                 VOUCHER CODE
               </span>
               <span className="font-mono-tabular text-2xl tracking-[0.1em] text-[#18224B] font-bold block">
-                {VOUCHER_CODE}
+                {voucherCode}
               </span>
               <span className="text-[11px] font-basel text-[#059669] block font-medium">
-                ₹500 OFF · NOVA Sanctuary, Lucknow
+                ₹{voucherAmount} OFF · NOVA Sanctuary, Lucknow
               </span>
             </div>
 
@@ -289,7 +297,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                 onClick={handleBookWithCredit}
                 className="w-full font-basel cursor-pointer py-3.5 px-6 text-xs uppercase tracking-[0.12em] bg-[#18224B] text-white hover:bg-[#2A3772] transition-colors font-medium"
               >
-                Book Ritual with ₹500 Credit →
+                Book Ritual with ₹{voucherAmount} Credit →
               </button>
 
               <a
