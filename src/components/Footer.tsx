@@ -100,13 +100,24 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking, onNavigatePage })
                       {contact.socials.map((soc, idx) => (
                         <React.Fragment key={soc.label}>
                           {idx > 0 && <span aria-hidden="true">/</span>}
-                          <button
-                            type="button"
-                            onClick={onOpenBooking}
-                            className="cursor-pointer hover:opacity-65 transition-opacity"
-                          >
-                            {soc.label}
-                          </button>
+                          {soc.url && soc.url.startsWith('http') ? (
+                            <a
+                              href={soc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:opacity-65 transition-opacity"
+                            >
+                              {soc.label}
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={onOpenBooking}
+                              className="cursor-pointer hover:opacity-65 transition-opacity"
+                            >
+                              {soc.label}
+                            </button>
+                          )}
                         </React.Fragment>
                       ))}
                     </div>

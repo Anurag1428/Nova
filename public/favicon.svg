@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#18224B" />
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="#C5B393" stroke-width="1.5" stroke-opacity="0.5" />
+  <text x="31" y="45" font-family="'Cormorant Garamond', Georgia, serif" font-size="40" font-weight="600" fill="#FBF9F5" text-anchor="middle">N</text>
+  <path d="M46 14 Q46 19 41 19 Q46 19 46 24 Q46 19 51 19 Q46 19 46 14 Z" fill="#C5B393" />
+</svg>

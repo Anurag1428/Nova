@@ -202,7 +202,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                   placeholder="e.g. Priya Sharma"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white border border-[#18224B]/20 px-3.5 py-2.5 font-basel text-sm text-[#18224B] placeholder:text-[#18224B]/35 focus:border-[#18224B] focus:outline-none transition-colors"
+                  className="w-full bg-white border border-[#18224B]/20 px-3.5 py-2.5 font-basel text-base sm:text-sm text-[#18224B] placeholder:text-[#18224B]/35 focus:border-[#18224B] focus:outline-none transition-colors"
                 />
               </div>
 
@@ -230,7 +230,7 @@ export const VipPrivilegeModal: React.FC<VipPrivilegeModalProps> = ({
                       setPhone(e.target.value);
                       setError(null);
                     }}
-                    className="flex-1 bg-white border border-[#18224B]/20 px-3.5 py-2.5 font-mono-tabular text-sm text-[#18224B] placeholder:text-[#18224B]/35 focus:border-[#18224B] focus:outline-none transition-colors"
+                    className="flex-1 bg-white border border-[#18224B]/20 px-3.5 py-2.5 font-mono-tabular text-base sm:text-sm text-[#18224B] placeholder:text-[#18224B]/35 focus:border-[#18224B] focus:outline-none transition-colors"
                   />
                 </div>
                 {error && (

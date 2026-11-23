@@ -485,8 +485,8 @@ export const SALON_CONFIG = {
       { days: 'Su', time: '10:00AM - 9:00PM' },
     ],
     socials: [
-      { label: 'Instagram', url: '#instagram' },
-      { label: 'Gift Cards', url: '#gift-cards' },
+      { label: 'Instagram', url: 'https://www.instagram.com/nova.unisexsalon8866?jplx=MXBtdTUweHdtMjJrdw==' },
+      { label: 'Gift Cards', url: 'https://wa.me/917275256535?text=Hello%20NOVA%20Sanctuary%2C%20I%20would%20like%20to%20inquire%20about%20purchasing%20a%20Sanctuary%20Gift%20Card%20or%20Experience%20Voucher.' },
     ],
   },
 

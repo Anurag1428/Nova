@@ -583,7 +583,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                           setForm((p) => ({ ...p, clientName: e.target.value }));
                           setErrors((prev) => ({ ...prev, clientName: undefined }));
                         }}
-                        className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-xs font-basel text-[#18224B] focus:border-[#18224B] focus:outline-none"
+                        className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-base sm:text-xs font-basel text-[#18224B] focus:border-[#18224B] focus:outline-none"
                       />
                       {errors.clientName && (
                         <p className="text-[11px] text-[#9E2A2B] mt-0.5">{errors.clientName}</p>
@@ -610,7 +610,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                             setForm((p) => ({ ...p, clientPhone: e.target.value }));
                             setErrors((prev) => ({ ...prev, clientPhone: undefined }));
                           }}
-                          className="flex-1 bg-white border border-[#18224B]/20 px-3 py-2 text-xs font-mono text-[#18224B] focus:border-[#18224B] focus:outline-none"
+                          className="flex-1 bg-white border border-[#18224B]/20 px-3 py-2 text-base sm:text-xs font-mono text-[#18224B] focus:border-[#18224B] focus:outline-none"
                         />
                       </div>
                       {errors.clientPhone && (
@@ -630,7 +630,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                       placeholder="e.g. Sensitive skin, bridal preference..."
                       value={form.notes}
                       onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-                      className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-xs font-basel text-[#18224B] focus:border-[#18224B] focus:outline-none"
+                      className="w-full bg-white border border-[#18224B]/20 px-3 py-2 text-base sm:text-xs font-basel text-[#18224B] focus:border-[#18224B] focus:outline-none"
                     />
                   </div>
                 </div>
