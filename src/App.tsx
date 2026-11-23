@@ -25,20 +25,32 @@ import {
   shouldAnimatePageTransition,
   TransitionPhase,
 } from './utils/pageTransition';
+import {
+  pathToRoute,
+  syncBrowserUrl,
+  updateDocumentMeta,
+} from './utils/routes';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   const liveSettings = useLiveSalonSettings();
+  const initialRouteRef = useRef(
+    typeof window !== 'undefined'
+      ? pathToRoute(window.location.pathname, window.location.hash)
+      : { page: 'home' as ActivePage, sectionId: undefined }
+  );
+
   const [openingStage, setOpeningStage] = useState<'curtain' | 'revealing' | 'complete'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('autostart') === '1') return 'complete';
+      if (initialRouteRef.current.page !== 'home') return 'complete';
     }
     return 'curtain';
   });
 
-  const [activePage, setActivePage] = useState<ActivePage>('home');
+  const [activePage, setActivePage] = useState<ActivePage>(initialRouteRef.current.page);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingPreset, setBookingPreset] = useState<{
     categoryId?: string;
@@ -142,13 +154,51 @@ export default function App() {
     };
   }, []);
 
-  const handleNavigatePage = (page: ActivePage, sectionId?: string) => {
+  // Update initial SEO metadata and handle deep-link section scrolling on mount
+  useEffect(() => {
+    updateDocumentMeta(activePage);
+    const targetSection = initialRouteRef.current.sectionId;
+    if (targetSection) {
+      const scrollTimer = window.setTimeout(() => {
+        const el = document.getElementById(targetSection);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 450);
+      return () => window.clearTimeout(scrollTimer);
+    }
+  }, []);
+
+  // Listen to browser Back and Forward navigation buttons
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      const state = e.state as { page?: ActivePage; sectionId?: string } | null;
+      if (state && state.page) {
+        handleNavigatePage(state.page, state.sectionId, false);
+      } else {
+        const fallback = pathToRoute(window.location.pathname, window.location.hash);
+        handleNavigatePage(fallback.page, fallback.sectionId, false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activePage]);
+
+  const handleNavigatePage = (
+    page: ActivePage,
+    sectionId?: string,
+    pushHistory = true
+  ) => {
+    syncBrowserUrl(page, sectionId, pushHistory ? 'push' : 'replace');
+
     const prefersReduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!shouldAnimatePageTransition(activePage, page, prefersReduced)) {
       setActivePage(page);
+      updateDocumentMeta(page);
       window.requestAnimationFrame(() => {
         if (sectionId) {
           const el = document.getElementById(sectionId);
@@ -166,6 +216,7 @@ export default function App() {
     const mainEl = mainRef.current;
     if (!curtain) {
       setActivePage(page);
+      updateDocumentMeta(page);
       window.scrollTo({ top: 0, behavior: 'auto' });
       return;
     }
@@ -197,6 +248,7 @@ export default function App() {
     tl.add(() => {
       setTransitionPhase('swapping');
       setActivePage(page);
+      updateDocumentMeta(page);
       if (sectionId) {
         window.requestAnimationFrame(() => {
           const el = document.getElementById(sectionId);
