@@ -413,7 +413,7 @@ export const TreatmentsSection: React.FC<TreatmentsSectionProps> = ({
                                       {ritual.name}
                                     </span>
                                     <span className="block font-mono-tabular text-[11px] text-[#18224B]/55">
-                                      {ritual.duration} · {ritual.examplePrice}
+                                      {ritual.duration}{ritual.examplePrice ? ` · ${ritual.examplePrice}` : ''}
                                     </span>
                                   </span>
                                 </button>

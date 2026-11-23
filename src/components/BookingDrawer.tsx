@@ -189,7 +189,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
           ritualName: curRitual?.name || 'Consultation Ritual',
           categoryId: activeCat.id,
           duration: curRitual?.duration || '60 min',
-          examplePrice: curRitual?.examplePrice || '₹3,000',
+          examplePrice: curRitual?.examplePrice || '',
           preferredDate: form.preferredDate || new Date().toISOString().split('T')[0],
           preferredTime: form.preferredTime || '11:00 AM',
           notes: form.notes || 'Inquiry auto-captured while typing form',
@@ -320,7 +320,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                     {selectedRitual.name}
                   </h3>
                   <p className="font-mono-tabular text-xs text-[#E8D5B5]">
-                    {selectedRitual.duration} · {selectedRitual.examplePrice}
+                    {selectedRitual.duration}{selectedRitual.examplePrice ? ` · ${selectedRitual.examplePrice}` : ''}
                   </p>
                 </>
               )}
@@ -508,9 +508,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({
                             </span>
                           </div>
                           <div className="text-right shrink-0">
-                            <span className="font-mono-tabular text-xs font-semibold text-[#18224B] block">
-                              {r.examplePrice}
-                            </span>
+                            {r.examplePrice ? (
+                              <span className="font-mono-tabular text-xs font-semibold text-[#18224B] block">
+                                {r.examplePrice}
+                              </span>
+                            ) : null}
                             <span className="text-[10px] text-[#18224B]/50 font-mono-tabular block">
                               {r.duration}
                             </span>

@@ -91,7 +91,7 @@ test('validateBookingForm rejects empty or invalid fields and accepts complete i
 
   const validResult = validateBookingForm({
     categoryId: 'facials',
-    ritualId: 'nova-signature-facial',
+    ritualId: 'o3-facial',
     clientName: 'Claire Moreau',
     clientEmail: 'claire@example.com',
     clientPhone: '+61 412 345 678',
@@ -125,14 +125,14 @@ test('SALON_CONFIG uses NOVA brand exclusively without legacy Maison Aura refere
   const { SALON_CONFIG } = await import('../data/salonData');
   assert.equal(SALON_CONFIG.brand.name, 'NOVA');
   assert.equal(SALON_CONFIG.about.team[0].name, 'Nova');
-  assert.equal(SALON_CONFIG.treatmentCategories[0].rituals[0].name, 'The NOVA Signature Facial');
+  assert.equal(SALON_CONFIG.treatmentCategories[0].rituals[0].name, 'O3+ Professional Facial');
   assert.equal(/maison\s+aura/i.test(JSON.stringify(SALON_CONFIG)), false);
 });
 
 test('validateBookingStep scopes validation cleanly to each consultation step', () => {
   const partialInput = {
     categoryId: 'facials',
-    ritualId: 'nova-signature-facial',
+    ritualId: 'o3-facial',
     clientName: '',
     clientEmail: '',
     clientPhone: '',
@@ -172,7 +172,7 @@ test('toggleRitualPreferenceNote adds and removes preference tags cleanly', () =
 test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon transmission links', () => {
   const booking = createBookingRecord({
     categoryId: 'facials',
-    ritualId: 'nova-signature-facial',
+    ritualId: 'o3-facial',
     clientName: 'Priya Sharma',
     clientEmail: 'priya@example.com',
     clientPhone: '+91 9876543210',
@@ -184,7 +184,7 @@ test('generateWhatsAppBookingUrl and generateEmailBookingUrl format direct salon
   const waUrl = generateWhatsAppBookingUrl(booking);
   assert.ok(waUrl.startsWith('https://wa.me/917275256535?text='));
   assert.ok(waUrl.includes('Priya%20Sharma'));
-  assert.ok(waUrl.includes('NOVA%20Signature%20Facial'));
+  assert.ok(waUrl.includes('O3%2B%20Professional%20Facial'));
 
   const emailUrl = generateEmailBookingUrl(booking);
   assert.ok(emailUrl.startsWith('mailto:info@novasalonlucknow.in?subject='));

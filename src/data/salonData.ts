@@ -248,31 +248,40 @@ export const SALON_CONFIG = {
       },
       rituals: [
         {
-          id: 'nova-signature-facial',
-          name: 'The NOVA Signature Facial',
-          duration: '75 min',
-          examplePrice: '₹2,500',
-          summary:
-            'A customized ritual combining double botanical cleansing, gentle enzymatic polish, extended sculptural facial massage, and a bespoke hydro-soothing mask.',
-          includes: ['Skin consultation', 'Sculptural buccal & lymphatic massage', 'Custom botanical mask', 'Scalp & neck release'],
-        },
-        {
-          id: 'barrier-calm-infusion',
-          name: 'Barrier Calm & Moisture Infusion',
+          id: 'o3-facial',
+          name: 'O3+ Professional Facial',
           duration: '60 min',
-          examplePrice: '₹1,800',
+          examplePrice: '',
           summary:
-            'Designed for sensitive, fatigued, or seasonally dry complexions seeking immediate comfort, lipid replenishment, and a soft, rested glow.',
-          includes: ['Chamomile & oat compress', 'Cooling stone drainage', 'Ceramide & squalane layering'],
+            'Signature O3+ clinical protocol combining deep pore oxygenation, gentle D-Tan exfoliation, and an advanced brightening peel-off mask for an immediate luminous glow.',
+          includes: ['O3+ enzymatic micro-cleanse', 'Oxygenating D-Tan therapy', 'Deep lifting facial massage', 'Brightening peel-off mask'],
         },
         {
-          id: 'sculpt-and-illuminate',
-          name: 'Sculpt & Illuminate Ritual',
-          duration: '90 min',
-          examplePrice: '₹3,200',
+          id: 'kentucky-kanpeki-facial',
+          name: 'Kentucky (Kanpeki) Facial',
+          duration: '60 min',
+          examplePrice: '',
           summary:
-            'An extended facial focused on releasing jaw and facial tension through slow, rhythmic manual contouring and warm botanical oil compresses.',
-          includes: ['Extended 40-min facial massage', 'Warm herbal poultice', 'Décolletage nourishment'],
+            'Japanese-engineered clinical skin ritual focused on cellular rejuvenation, melanin regulation, and deep dermal hydration for a refined porcelain finish.',
+          includes: ['Ultrasonic deep pore purification', 'Active peptide & antioxidant serum', 'Contouring lymphatic pressure points', 'Soothing biocellulose seal'],
+        },
+        {
+          id: 'casmara-facial',
+          name: 'Casmara Facial',
+          duration: '75 min',
+          examplePrice: '',
+          summary:
+            'World-renowned Spanish luxury treatment featuring concentrated vitamin ampoules and specialized cold-setting algae peel-off masks that tone, depuff, and deeply firm facial contours.',
+          includes: ['Double botanical thermal cleanse', 'Concentrated Casmara active ampoule', 'Signature Algae Peel-Off Mask with cryo cooling', 'Décolletage & neck release'],
+        },
+        {
+          id: 'hydraboost-facial',
+          name: 'HydraBoost Facial',
+          duration: '60 min',
+          examplePrice: '',
+          summary:
+            'High-performance hydra-dermabrasion technology delivering painless blackhead extraction, multi-level hyaluronic acid saturation, and cryo-firming for a dewy glass-skin finish.',
+          includes: ['Hydro-vortex suction extraction', 'Deep hyaluronic acid saturation', 'Cryo firming & pore tightening', 'Antioxidant barrier shield'],
         },
       ],
     },

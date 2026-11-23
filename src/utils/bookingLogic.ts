@@ -178,7 +178,7 @@ export function createBookingRecord(
   const categoryTitle = matched ? matched.category.title : 'Bespoke Treatment';
   const ritualName = matched ? matched.ritual.name : 'Selected Ritual';
   const duration = matched ? matched.ritual.duration : '60 min';
-  const examplePrice = matched ? matched.ritual.examplePrice : 'Upon consultation';
+  const examplePrice = matched ? (matched.ritual.examplePrice || '') : 'Upon consultation';
 
   // Deterministic, human-readable demo reference code
   const nameSeed = (input.clientName || 'NV').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2).padEnd(2, 'N');
@@ -306,7 +306,7 @@ export function generateWhatsAppMessageText(booking: ConfirmedDemoBooking): stri
     `• Guest: ${booking.clientName}`,
     `• Phone: ${booking.clientPhone}`,
     `• Email: ${booking.clientEmail}`,
-    `• Ritual: ${booking.ritualName} (${booking.duration} · ${booking.examplePrice})`,
+    `• Ritual: ${booking.ritualName} (${booking.duration}${booking.examplePrice ? ` · ${booking.examplePrice}` : ''})`,
     `• Preferred Date: ${booking.preferredDate}`,
     `• Time Window: ${booking.preferredTime}`,
   ];
